@@ -1,0 +1,3 @@
+rootProject.name = 'sapp_client'
+
+include ':app'
