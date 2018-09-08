@@ -89,7 +89,7 @@ const DrawerMenu = (props) => {
 const MyApp = DrawerNavigator(
   constNavigation
   ,{
-  initialRouteName: 'doorLocks',
+  initialRouteName: 'insertDoorLock',
   drawerPosition: 'left',
   contentComponent: DrawerMenu,
   drawerOpenRoute: 'DrawerOpen',

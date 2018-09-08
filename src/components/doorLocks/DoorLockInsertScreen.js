@@ -4,11 +4,13 @@ import {
     ScrollView,
     Text,
     TextInput,
-    Switch
+    Switch,
+    StyleSheet
 } from 'react-native';
 import InsertObjectScreen, { crudMode, styles } from '../crud/InsertObjectScreen';
 import Constants, { constNavigation } from '../../Constants';
 import SelectItems from '../selectItems/SelectItems';
+import DropdownSelectItems from '../selectItems/DropdownSelectItems';
 
 
 class DoorLockInsertScreen extends InsertObjectScreen {
@@ -119,9 +121,18 @@ class DoorLockInsertScreen extends InsertObjectScreen {
                         style={{ flex: 1, alignSelf: 'flex-end', marginRight: 20 }} />
                 </View>
                 
-
-                <SelectItems visible={true}/>
-
+                {/* <SelectItems visible={true} multipleSelection={false}/> */}
+                
+                <Text style={styles.inputLabel}>
+                    Local
+                </Text>
+                <View style={styles.dropdown}>
+                    <DropdownSelectItems
+                        dropdownTitle={"Nenhum local selecionado"}
+                        modalTitle={"Selecione um local"}
+                        multipleSelection={true} />
+                </View>
+                
 
                 {/* keepOpen: doorLock.keepOpen,
                 place: doorLock.place,

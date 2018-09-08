@@ -8,7 +8,7 @@ import {
 } from 'react-native';
 
 const selectedImg = require('../../../imgs/check.png');
-const unselectedImg = require('../../../imgs/cancel.png');
+const unselectedImg = require('../../../imgs/arrow_right.png');
 
 class ItemList extends Component {
 
@@ -39,12 +39,12 @@ class ItemList extends Component {
     render() {
         return(
             <TouchableOpacity onPress={this.props.onPress}>
-                <View style={[styles.container, { backgroundColor: this.state.selected ? selectedColor : null } ]}>
+                <View style={[styles.container, { backgroundColor: this.state.selected ? this.state.selectedColor : null } ]}>
                     <Image 
                         style={{ height: 24, width: 24 }}
                         source={ this.state.selected ? selectedImg : unselectedImg} />
 
-                    <Text> { this.state.item.name } </Text>
+                    <Text style={styles.text}> { this.state.item.name } </Text>
                 </View>
             </TouchableOpacity>
         );
@@ -54,8 +54,17 @@ class ItemList extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        margin: 5,
-        flexDirection: 'row'
+        // margin: 5,
+        padding: 5,
+        flexDirection: 'row',
+        borderBottomWidth: 1,
+        borderColor: '#dfdfdf',
+        borderStyle: 'dashed',
+        paddingBottom: 10,
+        paddingTop: 10
+    },
+    text: {
+        marginLeft: 20
     }
 });
 

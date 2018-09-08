@@ -291,6 +291,10 @@ export const styles = StyleSheet.create({
   imgButtons: {
     width: 40,
     height: 40
+  },
+  dropdown: {
+    marginLeft: 20,
+    marginRight: 40
   }
 });
 
