@@ -2,9 +2,11 @@ import React, { Component } from 'react';
 import {
     View,
     ScrollView,
-    Text
+    Text,
+    TextInput,
+    Switch
 } from 'react-native';
-import InsertObjectScreen, { crudMode } from '../crud/InsertObjectScreen';
+import InsertObjectScreen, { crudMode, styles } from '../crud/InsertObjectScreen';
 import Constants, { constNavigation } from '../../Constants';
 
 class DoorLockInsertScreen extends InsertObjectScreen {
@@ -22,24 +24,17 @@ class DoorLockInsertScreen extends InsertObjectScreen {
     }
 
     componentWillMount() {
-
-        let doorLock = {
-            id: 10,
-            name: "Porta 2",
-            description: null,
-            keepOpen: null,
-            place: null,
-            createdBy: null,
-            createdAt: null 
-        };
-
-        this.setObject(doorLock);
+        super.componentWillMount();
+        if (this.props.doorLock !== undefined)
+            this.setObject(this.props.doorLock);
     }
+
+    
 
     setObject = (doorLockReceived) => {
         let doorLock;
         let isNull = false;
-        if (doorLockReceived === null) {
+        if (doorLockReceived === undefined || doorLockReceived === null) {
           isNull = true;
           doorLock = {
             id: 0,
@@ -87,10 +82,46 @@ class DoorLockInsertScreen extends InsertObjectScreen {
         return constNavigation.doorLocks.route;
     };
 
+    handleChangeDescription = (text) => {
+        let object = this.state.object;
+        object.description = text;
+        this.setState( { object } );
+    };
+
+    handleChangeKeepOpen = (value) => {
+        let object = this.state.object;
+        object.keepOpen = value;
+        this.setState( { object } );
+    };
+
     renderBody = () => {
         return(
             <ScrollView>
-                <Text>Teste</Text>
+                <Text style={styles.inputLabel}>
+                    Descrição
+                </Text>
+                <TextInput 
+                    value={this.state.object.description}
+                    onChangeText={this.handleChangeDescription}
+                    style={styles.input}
+                    editable={this.state.crudMode === crudMode.edit} />
+                
+                <View style={{ flexDirection: 'row', alignSelf: 'stretch' }}>
+                    <Text style={styles.inputLabel}>
+                        Manter aberta
+                    </Text>
+                    <Switch 
+                        value={this.state.object.keepOpen}
+                        onValueChange={this.handleChangeKeepOpen}
+                        disabled={this.state.crudMode !== crudMode.edit}
+                        style={{ flex: 1, alignSelf: 'flex-end', marginRight: 20 }} />
+                </View>
+                
+                
+                {/* keepOpen: doorLock.keepOpen,
+                place: doorLock.place,
+                createdBy: doorLock.createdBy,
+                createdAt: doorLock.createdAt */}
             </ScrollView>
         );
     }

@@ -3,13 +3,13 @@ import HomeScreen from './components/home/HomeScreen';
 import SettingsScreen from './components/settings/SettingsScreen';
 import UsersScreen from './components/users/UsersScreen';
 import ControlModulesScreen from './components/controlModules/ControlModulesScreen';
-import DoorLocksScreen from './components/doorLocks/DoorLocksScreen';
 import PlacesScreen from './components/places/PlacesScreen';
 import EventsScreen from './components/events/EventsScreen';
 import AboutScreen from './components/about/AboutScreen';
 import InsertUserScreen from './components/users/InsertUserScreen';
 import InsertPlaceScreen from './components/places/InsertPlaceScreen';
 import DoorLockInsertScreen from './components/doorLocks/DoorLockInsertScreen';
+import DoorLockScreen from './components/doorLocks/DoorLockScreen';
 
 const navigationOptionsHide = ({ navigation }) => ({
     drawerLabel: () => null
@@ -34,7 +34,7 @@ export const constNavigation = {
     },
     doorLocks: {
         route: 'doorLocks',
-        screen: DoorLocksScreen,
+        screen: DoorLockScreen,
     },
     places: {
         route: 'places',
@@ -62,7 +62,7 @@ export const constNavigation = {
         route: 'insertDoorLock',
         screen: DoorLockInsertScreen,
         navigationOptions: navigationOptionsHide,
-    },
+    }
 };
 
 export const colors = {

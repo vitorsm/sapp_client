@@ -39,6 +39,17 @@ class InsertObjectScreen extends Component {
     //this.state.title
     //this.state.isKeyboardHide
     //super.componentDidMount
+    //super.componentWillMount
+
+    componentWillMount() {
+
+      if (this.props.crudMode != undefined) {
+        this.setState( { crudMode: this.props.crudMode } );
+      }
+      let object = this.props.navigation.getParam('object', null);
+      
+      this.setObject(object);
+    }
 
     componentDidMount() {
       if (this.keyboardDidShowListener !== undefined)
@@ -50,6 +61,7 @@ class InsertObjectScreen extends Component {
       this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => this.setState( { isKeyboardHide: false } ));
       this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => this.setState( { isKeyboardHide: true } ));
     }
+    
 
     getScreenBack = () => {
         let navScreenBack = this.props.navigation.getParam('screenBack', null);
@@ -212,7 +224,7 @@ class InsertObjectScreen extends Component {
 
 }
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1
   },
@@ -249,7 +261,8 @@ const styles = StyleSheet.create({
   inputLabel: {
     marginLeft: 20,
     marginTop: 20,
-    marginBottom: 10
+    marginBottom: 10,
+    alignSelf: 'flex-start'
   },
   input: {
     marginLeft: 20,

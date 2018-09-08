@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import NavBar, { buttonView } from '../NavBar';
 import Constants, { constNavigation, addImg, refreshImg } from '../../Constants';
+import ObjectListItem from './ObjectListItem';
+import FloatActionButton from '../FloatActionButton';
 
 class ObjectScreen extends Component {
 
@@ -47,7 +49,7 @@ class ObjectScreen extends Component {
         this.setState( { objectsFilter: list } );
     };
 
-    navigateToInsertUserScreen = (object) => {
+    navigateToInsertScreen = (object) => {
         this.props.navigation.navigate(this.state.routeInsertScreen, { object: object});
     }
 
@@ -56,12 +58,8 @@ class ObjectScreen extends Component {
     
         return this.state.objectsFilter.map( object => {
           return(
-            <TouchableOpacity key={object.id} onPress={ () => { this.navigateToInsertUserScreen(object); } } >
-              <ObjectListItem object={{
-                id: object.id,
-                description: object.name,
-                name: object.login
-              }}/>
+            <TouchableOpacity key={object.id} onPress={ () => { this.navigateToInsertScreen(object); } } >
+              <ObjectListItem object={ object }/>
             </TouchableOpacity>
           );
         });
@@ -108,5 +106,19 @@ class ObjectScreen extends Component {
         );
     }
 }
+
+const styles = StyleSheet.create({
+    list: {
+      margin: 10
+    },
+    viewButton: {
+      // flex: 1,
+      // alignSelf: 'stretch',
+      justifyContent: 'flex-end',
+      alignItems: 'flex-end',
+      marginRight: 10,
+      flexDirection: 'row'
+    }
+});
 
 export default ObjectScreen;
