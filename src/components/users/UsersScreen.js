@@ -11,7 +11,7 @@ import {
 import NavBar, {buttonView} from '../NavBar';
 import Constants, { constNavigation, addImg, refreshImg } from '../../Constants';
 // import UserListItem from './UserListItem';
-import ObjectListItem from '../ObjectListItem';
+import ObjectListItem from '../crud/ObjectListItem';
 import FloatActionButton from '../FloatActionButton';
 
 

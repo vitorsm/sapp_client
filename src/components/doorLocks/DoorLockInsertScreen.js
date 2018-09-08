@@ -8,6 +8,8 @@ import {
 } from 'react-native';
 import InsertObjectScreen, { crudMode, styles } from '../crud/InsertObjectScreen';
 import Constants, { constNavigation } from '../../Constants';
+import SelectItems from '../selectItems/SelectItems';
+
 
 class DoorLockInsertScreen extends InsertObjectScreen {
     constructor(props) {
@@ -117,7 +119,10 @@ class DoorLockInsertScreen extends InsertObjectScreen {
                         style={{ flex: 1, alignSelf: 'flex-end', marginRight: 20 }} />
                 </View>
                 
-                
+
+                <SelectItems visible={true}/>
+
+
                 {/* keepOpen: doorLock.keepOpen,
                 place: doorLock.place,
                 createdBy: doorLock.createdBy,
