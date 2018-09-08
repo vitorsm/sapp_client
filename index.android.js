@@ -4,24 +4,25 @@ import {
   StyleSheet,
   Text,
   View,
+  ScrollView,
   StatusBar,
   Image,
   TouchableOpacity
 } from 'react-native';
-import HomeScreen from './src/components/HomeScreen';
-import SettingScreen from './src/components/SettingScreen';
+
 import { DrawerNavigator, DrawerItems } from 'react-navigation';
-import LoginScreen from './src/components/LoginScreen';
+import LoginScreen from './src/components/login/LoginScreen';
+import Constants, { constNavigation } from './src/Constants';
 
-
-const logoIcon = require('./imgs/logo.png');
+const accountIcon = require('./imgs/account.png');
+const exitIcon = require('./imgs/exit.png');
 
 export default class sapp_client extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      token: null
+      token: "null"
     };
   }
 
@@ -59,48 +60,54 @@ export default class sapp_client extends Component {
 
 const DrawerMenu = (props) => {
   return (
-    <View style = {{ flex: 1 }}>
-      <View style = {{ marginBottom: 10 }}>
-        <Image source={logoIcon} />
-      </View>
+    <ScrollView style = {{ flex: 1 }}>
+      <TouchableOpacity onPress={ () => { alert("clicou na coisa de ver conta do usuario") }}>
+        <View style = {{ paddingTop: 20, paddingBottom: 20, paddingLeft: 10, backgroundColor: '#00a4d3', flexDirection: 'row' }}>
+          <Image source={accountIcon} />
+          <View style={{ alignSelf: 'stretch', justifyContent: 'center' }}>
+            <Text style={{ fontSize: 16, color: 'white' }}>Vítor de Sousa Moreira</Text>
+          </View>
+        </View>
+      </TouchableOpacity>
+      
       
       <View>
         <DrawerItems {...props} />
       </View>
 
-      <View style={styles.exitMenuView}>
-        <TouchableOpacity onPress={ props.setLogoff }>
+      <View>
+        <TouchableOpacity onPress={ props.setLogoff } style={styles.exitMenuView}>
+          <Image source={exitIcon} style={{width: 24, height: 24}}/>
           <Text style={styles.exitMenu}>Sair</Text>
         </TouchableOpacity>
       </View>
 
-    </View>
+    </ScrollView>
   );
 };
 
-const MyApp = DrawerNavigator({
-  Home: {
-    screen: HomeScreen
-  },
-  Setting: {
-    screen: SettingScreen
-  }
-},{
-  initialRouteName: 'Home',
+const MyApp = DrawerNavigator(
+  constNavigation
+  ,{
+  initialRouteName: 'insertDoorLock',
   drawerPosition: 'left',
   contentComponent: DrawerMenu,
   drawerOpenRoute: 'DrawerOpen',
   drawerCloseRoute: 'DrawerClose',
-  drawerToggleRoute: 'DrawerToggle'
+  drawerToggleRoute: 'DrawerToggle',
+  animationEnabled: 'true'
 });
 
 const styles = StyleSheet.create({
   exitMenuView: {
-    marginLeft: 17
+    marginLeft: 17,
+    flexDirection: 'row'
   },
   exitMenu: {
     fontWeight: 'bold',
-    color: 'black'
+    color: 'black',
+    marginLeft: 31,
+    fontSize: 16
   }
 });
 

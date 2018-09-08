@@ -3,10 +3,21 @@ import {
   StyleSheet,
   Text,
   View,
+  Image
 } from 'react-native';
-import NavBar from './NavBar'
+import NavBar from '../NavBar'
+
+const img = require('../../../imgs/home.png');
 
 class HomeScreen extends Component {
+  static navigationOptions = {
+    drawerIcon: (
+      <Image 
+        source={img}
+        style={{ height: 24, width: 24}} />
+    )
+  };
+
   render() {
     return (
       <View>

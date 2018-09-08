@@ -5,15 +5,21 @@ import {
   Alert,
   StyleSheet,
   View,
-  Text
+  Text,
+  TextInput
 } from 'react-native';
-
+import { StackActions } from 'react-navigation';
 
 const searchImg = require('../../imgs/search.png');
-const buttonImg = require('../../imgs/menu.png');
-const buttonView = {
+const menuImg = require('../../imgs/menu.png');
+const filterImg = require('../../imgs/filter.png');
+const backImg = require('../../imgs/arrow_back.png');
+const closeImg = require('../../imgs/close.png');
+
+export const buttonView = {
   menu: 1,
-  back: 2
+  back: 2,
+  backWithoutFilter: 3
 };
 const appName = "SAPP Client";
 
@@ -23,7 +29,10 @@ class NavBar extends Component {
 
     this.state = {
       buttonView: buttonView.menu,
-      menuText: undefined
+      menuText: undefined,
+      showButton: true,
+      searchMode: false,
+      textSearch: null
     };
 
   }
@@ -32,19 +41,112 @@ class NavBar extends Component {
     if (btView === undefined || btView === null)
       this.setState( { buttonView: buttonView.menu } );
     else
-    this.setState( { btView } );
+    this.setState( { buttonView: btView } );
   }
 
   componentWillMount() {
     this.setButtonView(this.props.buttonView);
-    this.setState( { menuText: this.props.menuText } );
+    this.setState( { 
+      menuText: this.props.menuText,
+      showButton: this.props.showButton === undefined ? true : this.props.showButton
+    } );
   }
 
   componentWillReceiveProps(nextProps) {
+    
     if (nextProps.buttonView !== this.props.buttonView) {
       this.setButtonView(nextProps.buttonView);
     } else if (nextProps.menuText !== this.props.menuText) {
       this.setState( { menuText: nextProps.menuText} );
+    } else if (nextProps.showButton !== this.props.showButton) {
+      this.setState( { showButton: nextProps.showButton } );
+    }
+  }
+
+  handleClickSearchButton = () => {
+    if (this.state.searchMode)
+      this.props.onChangeText(null);
+    
+    this.setState( { searchMode: !this.state.searchMode } );
+  };
+
+  handleClickMenuButton = () => {
+    if (this.state.buttonView == buttonView.backWithoutFilter ||
+      this.state.buttonView == buttonView.back) {
+      this.props.navigation.navigate(this.props.screenBack);
+    } else {
+      this.props.navigation.openDrawer();
+    }
+  }
+
+  renderFilterButtonImg = () => {
+    if (this.state.searchMode) {
+      return(
+        <Image 
+          source={closeImg}
+          style={styles.menuImg} />
+      );
+    } else {
+      return (
+        <Image 
+          source={searchImg}
+          style={styles.menuImg} />
+      );
+    }
+  };
+
+  renderFilterButton = () => {
+    if (this.state.buttonView == buttonView.backWithoutFilter) {
+      return null;
+    } else {
+      return(
+        <View style={styles.findButtonView}>
+          <TouchableOpacity onPress = { this.handleClickSearchButton }>
+            { this.renderFilterButtonImg() }
+          </TouchableOpacity>
+        </View>
+      );
+    }
+  }
+
+  renderButton = () => {
+    if (!this.state.showButton) {
+      return(
+        <View style={styles.menuButtonView}>
+          <View style={styles.menuImg}/>
+        </View>
+      );
+    }
+
+    return(
+      <View style={styles.menuButtonView}>
+        <TouchableOpacity onPress = { this.handleClickMenuButton } disabled={!this.state.showButton}>
+          <Image 
+            source={ this.state.buttonView == buttonView.menu ? menuImg : backImg }
+            style={styles.menuImg} />
+        </TouchableOpacity>
+      </View>
+    );
+  }
+
+  renderMenuText = () => {
+
+    if (this.state.searchMode) {
+      return(
+        <TextInput 
+          placeholder={"Pesquisa..."} 
+          value={this.state.textSearch}
+          style={styles.search}
+          onChangeText={this.props.onChangeText}
+          placeholderTextColor={"white"}
+          underlineColorAndroid={"white"} />
+      );
+    } else {
+      return(
+        <Text style={styles.text}>
+          { this.state.menuText !== undefined ? this.state.menuText : appName }
+        </Text>
+      );
     }
   }
 
@@ -52,37 +154,29 @@ class NavBar extends Component {
     return(
       <View style={styles.nav}>
 
-        <View style={styles.menuButtonView}>
-          <TouchableOpacity onPress = { () => { this.props.navigation.openDrawer(); } }>
-            <Image 
-              source={buttonImg}
-              style={styles.menuImg} />
-          </TouchableOpacity>
+        <View style={styles.leftView}>
+          { this.renderButton() }
+
+          <View style={styles.menuTextView}>
+            { this.renderMenuText() }
+          </View>
         </View>
 
-        <View style={styles.menuTextView}>
-          <Text style={styles.text}>
-            { this.state.menuText !== undefined ? this.state.menuText : appName }
-          </Text>
-        </View>
-
-        <View style={styles.findButtonView}>
-          <TouchableOpacity onPress = { () => { alert("clicou na busca") } }>
-            <Image 
-              source={searchImg}
-              style={styles.menuImg} />
-          </TouchableOpacity>
-        </View>
-
+        { this.renderFilterButton() }
+        
       </View>
     );
   };
 }
 
 const styles = StyleSheet.create({
+  leftView: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    flex: 3
+  },
   menuButtonView: {
-    flex: 1,
-    alignItems: 'flex-start'
+    padding: 10
   },
   menuImg: {
     height: 36,
@@ -90,21 +184,28 @@ const styles = StyleSheet.create({
   },
   menuTextView: {
     flex: 1,
-    alignItems: 'flex-start',
     padding: 10,
-    justifyContent: 'flex-start'
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+    alignItems: 'stretch'
   },
   text: {
-    fontSize: 15
+    fontSize: 18,
+    color: 'white'
   },
   findButtonView: {
     flex: 1,
-    alignItems: 'flex-end'
+    alignItems: 'flex-end',
+    alignSelf: 'stretch',
+    padding: 10,
   },
   nav: {
-    backgroundColor: '#CCC',
-    padding: 10,
+    backgroundColor: '#00a4d3',
     flexDirection: 'row'
+  },
+  search: {
+    fontSize: 14,
+    color: 'white'
   }
 });
 

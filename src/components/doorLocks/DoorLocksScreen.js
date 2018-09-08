@@ -3,10 +3,22 @@ import {
   StyleSheet,
   Text,
   View,
+  Image
 } from 'react-native';
-import NavBar from './NavBar'
+import NavBar from '../NavBar'
 
-class SettingSrceen extends Component {
+const img = require('../../../imgs/door_locks.png');
+
+
+class DoorLocksScreen extends Component {
+  static navigationOptions = {
+    drawerIcon: (
+      <Image 
+        source={img}
+        style={{ height: 24, width: 24}} />
+    )
+  };
+
   render() {
     return (
       <View>
@@ -24,4 +36,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default SettingSrceen;
+export default DoorLocksScreen;

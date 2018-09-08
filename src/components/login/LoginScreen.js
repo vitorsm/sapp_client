@@ -9,7 +9,7 @@ import {
   TouchableOpacity
 } from 'react-native';
 
-const logoIcon = require('../../imgs/logo.png');
+const logoIcon = require('../../../imgs/logo.png');
 
 class LoginScreen extends Component {
     constructor(props) {
@@ -22,6 +22,7 @@ class LoginScreen extends Component {
     }
 
     handleLoginButton = () => {
+        alert("logou com " + this.state.loginText + " | " + this.state.passwordText);
         this.props.setToken("TESTE");
     };
 
