@@ -58,7 +58,7 @@ class ObjectScreen extends Component {
     
         return this.state.objectsFilter.map( object => {
           return(
-            <TouchableOpacity key={object.id} onPress={ () => { this.navigateToInsertScreen(object); } } >
+            <TouchableOpacity activeOpacity={0.7} key={object.id} onPress={ () => { this.navigateToInsertScreen(object); } } >
               <ObjectListItem object={ object }/>
             </TouchableOpacity>
           );

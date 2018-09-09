@@ -34,6 +34,7 @@ class InsertObjectScreen extends Component {
     //handle changes
     //this.state.crudMode
     //this.state.object ( deve conter id e name )
+    //this.state.backupObject ( deve conter id e name )
     //this.state.description ( do q se trata a classe. ex.: "do usuário")
     //renderBody ( dentro de um ScrollView )
     //this.state.title

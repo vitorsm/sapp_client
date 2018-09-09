@@ -8,7 +8,9 @@ import {
 } from 'react-native';
 import SelectItems from './SelectItems';
 
-const defualtBackgroundColor = '#BDBDBD';
+// const defualtBackgroundColor = '#00a4d3';rgba(0, 164, 211, 0.5)
+const defualtBackgroundColor = '#7a7a7a';
+
 const imgArrow = require('../../../imgs/arrow_drop_down.png');
 
 class DropdownSelectedItems extends Component {
@@ -22,58 +24,25 @@ class DropdownSelectedItems extends Component {
             backgroundColor: defualtBackgroundColor,
             items: [],
             selectedItems: [],
-            showModal: false
+            showModal: false,
+            editable: true,
+            textAddButton: null
         };
     }
 
     componentWillMount() {
-        let test = [{
-            id: 1,
-            name: "Coisa 1"
-        },{
-            id: 2,
-            name: "Coisa 2"
-        },{
-            id: 3,
-            name: "Coisa 3"
-        }, {
-            id: 4,
-            name: "Coisa 1"
-        },{
-            id: 5,
-            name: "Coisa 2"
-        },{
-            id: 6,
-            name: "Coisa 3"
-        }, {
-            id: 7,
-            name: "Coisa 1"
-        },{
-            id: 8,
-            name: "Coisa 2"
-        },{
-            id: 9,
-            name: "Coisa 3"
-        }, {
-            id: 10,
-            name: "Coisa 1"
-        },{
-            id: 11,
-            name: "Coisa 2"
-        },{
-            id: 12,
-            name: "Coisa 3"
-        }];
 
         this.setState( { 
-            // items: this.props.items !== undefined && this.props.items !== null ? this.props.items : [],
-            items: test,
+            items: this.props.items !== undefined && this.props.items !== null ? this.props.items : [],
             selectedItems: this.props.selectedItems !== undefined && this.props.selectedItems !== null ? this.props.selectedItems : [],
             multipleSelection: this.props.multipleSelection,
             backgroundColor: this.props.backgroundColor !== undefined ? this.props.backgroundColor : defualtBackgroundColor,
             modalTitle: this.props.modalTitle,
-            dropdownTitle: this.props.dropdownTitle
-         } );
+            dropdownTitle: this.props.dropdownTitle,
+            editable: this.props.editable !== undefined ? this.props.editable : true,
+            textAddButton: this.props.textAddButton !== undefined ? this.props.textAddButton : null
+        } );
+        
     }
 
     componentWillReceiveProps(nextProps) {
@@ -89,15 +58,20 @@ class DropdownSelectedItems extends Component {
             this.setState( { modalTitle: nextProps.modalTitle } );
         } else if (nextProps.dropdownTitle !== this.props.dropdownTitle) {
             this.setState( { dropdownTitle: nextProps.dropdownTitle } );
+        } else if (nextProps.editable !== this.props.editable) {
+            this.setState( { editable: nextProps.editable !== undefined ? nextProps.editable : true } );
+        } else if (nextProps.textAddButton !== this.props.textAddButton) {
+            this.setState( { textAddButton: nextProps.textAddButton !== undefined ? nextProps.textAddButton : null } );
         }
     }
 
     handleClick = () => {
-        let showModal = this.state.showModal
-        showModal = !showModal;
+        if (this.state.editable) {
+            let showModal = this.state.showModal
+            showModal = !showModal;
 
-        this.setState( { showModal } );
-
+            this.setState( { showModal } );
+        }
     };
 
     handleCancelClick = (selectedItems) => {
@@ -132,11 +106,12 @@ class DropdownSelectedItems extends Component {
     render() {
         return(
             <TouchableOpacity
-                onPress={ this.handleClick }>
+                onPress={ this.handleClick }
+                activeOpacity={ this.state.editable ? 0.5 : 1 }>
                 <View 
                     style={[styles.container, { backgroundColor: this.state.backgroundColor }]}>
                     <View style={styles.textView}>
-                        <Text>
+                        <Text style={styles.text}>
                             { this.renderText() }
                         </Text>
                     </View>
@@ -154,7 +129,8 @@ class DropdownSelectedItems extends Component {
                         title={this.state.modalTitle}
                         visible={this.state.showModal}
                         cancelOnPress={this.handleCancelClick}
-                        okOnPress={this.handleOkClick} />
+                        okOnPress={this.handleOkClick}
+                        textAddButton={this.state.textAddButton} />
                 </View>
             </TouchableOpacity>
         );
@@ -180,6 +156,9 @@ const styles = StyleSheet.create({
     img: {
         height: 24,
         width: 24
+    },
+    text: {
+        color: 'white'
     }
 });
 export default DropdownSelectedItems;

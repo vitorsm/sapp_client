@@ -108,7 +108,8 @@ class DoorLockInsertScreen extends InsertObjectScreen {
                     value={this.state.object.description}
                     onChangeText={this.handleChangeDescription}
                     style={styles.input}
-                    editable={this.state.crudMode === crudMode.edit} />
+                    editable={this.state.crudMode === crudMode.edit}
+                    placeholder={"Insira aqui a descição"} />
                 
                 <View style={{ flexDirection: 'row', alignSelf: 'stretch' }}>
                     <Text style={styles.inputLabel}>
@@ -130,7 +131,8 @@ class DoorLockInsertScreen extends InsertObjectScreen {
                     <DropdownSelectItems
                         dropdownTitle={"Nenhum local selecionado"}
                         modalTitle={"Selecione um local"}
-                        multipleSelection={true} />
+                        multipleSelection={false}
+                        editable={ this.state.crudMode == crudMode.edit } />
                 </View>
                 
 

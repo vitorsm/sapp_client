@@ -10,18 +10,22 @@ import InsertUserScreen from './components/users/InsertUserScreen';
 import InsertPlaceScreen from './components/places/InsertPlaceScreen';
 import DoorLockInsertScreen from './components/doorLocks/DoorLockInsertScreen';
 import DoorLockScreen from './components/doorLocks/DoorLockScreen';
+import RfIdCardsScreen from './components/rfIdCards/RfIdCardsScreen';
+import RfIdCardsInsertScreen from './components/rfIdCards/RfIdCardsInsertScreen';
+import InsertControlModuleScreen from './components/controlModules/InsertControlModuleScreen';
+import InsertEventScreen from './components/events/InsertEventScreen';
 
 const navigationOptionsHide = ({ navigation }) => ({
     drawerLabel: () => null
-  });
+});
 
 export const constNavigation = {
     home: {
         route: 'home',
         screen: HomeScreen
     },
-    controlModule: {
-        route: 'controlModule',
+    controlModules: {
+        route: 'controlModules',
         screen: ControlModulesScreen
     },
     events: {
@@ -31,6 +35,10 @@ export const constNavigation = {
     users: {
         route: 'users',
         screen: UsersScreen
+    },
+    rfIdCards: {
+        route: 'rfIdCards',
+        screen: RfIdCardsScreen
     },
     doorLocks: {
         route: 'doorLocks',
@@ -62,6 +70,21 @@ export const constNavigation = {
         route: 'insertDoorLock',
         screen: DoorLockInsertScreen,
         navigationOptions: navigationOptionsHide,
+    },
+    insertRfIdCard: {
+        route: 'insertRfIdCard',
+        screen: RfIdCardsInsertScreen,
+        navigationOptions: navigationOptionsHide
+    },
+    insertControlModule: {
+        route: 'insertControlModule',
+        screen: InsertControlModuleScreen,
+        navigationOptions: navigationOptionsHide
+    },
+    insertEvent: {
+        route: 'insertEvent',
+        screen: InsertEventScreen,
+        navigationOptions: navigationOptionsHide
     }
 };
 

@@ -11,7 +11,6 @@ import {
 import ItemList from './ItemList';
 
 const defualtBackgroundColor = '#BDBDBD';
-
 const defaultAmountShowFilter = 2;
 
 class SelectItems extends Component {
@@ -31,7 +30,8 @@ class SelectItems extends Component {
             visible: false,
             backgroundColor: defualtBackgroundColor,
             amountShowFilter: defaultAmountShowFilter,
-            textSearch: null
+            textSearch: null,
+            textAddButton: null
         };
     }
 
@@ -45,7 +45,8 @@ class SelectItems extends Component {
             visible: this.props.visible,
             backgroundColor: this.props.backgroundColor !== undefined ? this.props.backgroundColor : defualtBackgroundColor,
             title: this.props.title,
-            amountShowFilter: this.props.amountShowFilter !== undefined && this.props.amountShowFilter !== null ? this.props.amountShowFilter : defaultAmountShowFilter
+            amountShowFilter: this.props.amountShowFilter !== undefined && this.props.amountShowFilter !== null ? this.props.amountShowFilter : defaultAmountShowFilter,
+            textAddButton: this.props.textAddButton
          } );
     }
 
@@ -57,7 +58,7 @@ class SelectItems extends Component {
                 itemsFiltered: nextProps.items !== undefined && nextProps.items !== null ? nextProps.items : [],
                 textSearch: null
             });
-        } 
+        }
         if (nextProps.selectedItems !== this.props.selectedItems) {
             this.setState( { 
                 selectedItems: nextProps.selectedItems !== undefined && nextProps.selectedItems !== null ? nextProps.selectedItems : [], 
@@ -84,6 +85,9 @@ class SelectItems extends Component {
         }
         if (nextProps.amountShowFilter !== this.props.amountShowFilter) {
             this.setState( { amountShowFilter: nextProps.amountShowFilter !== undefined && nextProps.amountShowFilter !== undefined !== null ? nextProps.amountShowFilter : defaultAmountShowFilter } );
+        }
+        if (nextProps.textAddButton !== this.props.textAddButton) {
+            this.setState( { textAddButton: nextProps.textAddButton } );
         }
     }
 
@@ -163,12 +167,23 @@ class SelectItems extends Component {
         );
     };
 
+    renderAddButton = () => {
+        if (this.state.textAddButton === null || this.state.textAddButton === null) return null;
+
+        return (
+            <TouchableOpacity  style={styles.okButtonView} onPress= { this.props.addButtonOnPress } >
+                <Text style={styles.okButtonText} >{this.state.textAddButton}</Text>
+            </TouchableOpacity>
+        );
+    };
+
     renderHeader = () => {
         return (
             <View style={styles.header}>
                 <Text style={styles.textTitle}>{ this.state.title }</Text>
                 { this.renderFilter() }
                 { this.renderSelectAll() }
+                { this.renderAddButton() }
             </View>
         );
     };
@@ -267,8 +282,9 @@ const styles = StyleSheet.create({
     },
     containerFoward: {
         borderRadius: 5,
-        minWidth: '90%'
-        // backgroundColor: 'green'
+        minWidth: '98%',
+        // borderWidth: 2,
+        // borderColor: 'white'
     },
     header: {
         margin: 20
@@ -289,7 +305,8 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: 'gray',
         marginLeft: 20,
-        marginRight: 20
+        marginRight: 20,
+        color: 'white'
     },
     okButtonView: {
         padding: 10,
@@ -298,7 +315,8 @@ const styles = StyleSheet.create({
         backgroundColor: '#00a4d3',
         borderRadius: 5,
         alignItems: 'center',
-        marginLeft: 10
+        marginLeft: 10,
+        marginTop: 10
     },
     okButtonText: {
         color: 'white',
@@ -316,7 +334,8 @@ const styles = StyleSheet.create({
     textSelectAll: {
         fontSize: 16,
         fontWeight: 'bold',
-        marginTop: 20
+        marginTop: 20,
+        color: 'white'
     }
 });
 
