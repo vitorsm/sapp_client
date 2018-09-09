@@ -86,6 +86,10 @@ class DoorLockInsertScreen extends InsertObjectScreen {
         return constNavigation.doorLocks.route;
     };
 
+    getObjectScreenBack = () => {
+        return null;
+    };
+
     handleChangeDescription = (text) => {
         let object = this.state.object;
         object.description = text;

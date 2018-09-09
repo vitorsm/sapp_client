@@ -86,6 +86,10 @@ class RfIdCardInsertScreen extends InsertObjectScreen {
         return constNavigation.rfIdCards.route;
     };
 
+    getObjectScreenBack = () => {
+        return null;
+    };
+
     handleChangeDescription = (text) => {
         let object = this.state.object;
         object.description = text;

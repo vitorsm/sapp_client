@@ -89,7 +89,7 @@ const DrawerMenu = (props) => {
 const MyApp = DrawerNavigator(
   constNavigation
   ,{
-  initialRouteName: 'home',
+  initialRouteName: 'about',
   drawerPosition: 'left',
   contentComponent: DrawerMenu,
   drawerOpenRoute: 'DrawerOpen',
@@ -100,7 +100,8 @@ const MyApp = DrawerNavigator(
 
 const styles = StyleSheet.create({
   exitMenuView: {
-    marginLeft: 17,
+    padding: 10,
+    marginLeft: 7,
     flexDirection: 'row'
   },
   exitMenu: {

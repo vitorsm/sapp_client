@@ -66,7 +66,7 @@ import {
         margin: 5,
         backgroundColor: 'rgba(0, 164, 211, 0.5)',
         padding: 20,
-        borderRadius: 5,
+        // borderRadius: 5,
         flexDirection: 'row',
     },
     containerLeft: {

@@ -4,20 +4,56 @@ import {
     View,
     ScrollView,
     StyleSheet,
-    Image
+    Image,
+    PanResponder
 } from 'react-native';
 import NavBar, { buttonView } from '../NavBar';
+import HomeCard from './HomeCard';
+import HomeButton from './HomeButton';
+import { constNavigation } from '../../Constants';
+
 
 const img = require('../../../imgs/home.png');
 const appName = "SAPP Client";
+
+var fScroll = null;
+
+const imgNetwork = require('../../../imgs/module_network.png');
 
 class HomeScreen extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
-            title: ""
+            title: "",
+            loggedUser: {
+                name: "Vítor de Sousa Moreira"
+            }
         };
+    }
+
+    componentWillMount() {
+        // this.setState( { fScroll: this._panResponder.fScroll } );
+
+        this._panResponder = PanResponder.create({
+
+            onMoveShouldSetResponderCapture: () => true,
+            onMoveShouldSetPanResponderCapture: () => true,
+            onPanResponderGrant: (e, gestureState) => {
+              this.fScroll.setNativeProps({ scrollEnabled: false })
+            },
+            onPanResponderMove: () => {
+      
+            },
+            onPanResponderTerminationRequest: () => true,
+            onPanResponderRelease: () => {
+              this.fScroll.setNativeProps({ scrollEnabled: true })
+            },
+            fScroll: this.fScroll
+        });
+    }
+
+    componentDidMount() {
     }
 
     static navigationOptions = {
@@ -30,15 +66,36 @@ class HomeScreen extends Component {
     };
 
     renderLastEvents = () => {
-        
+        return(
+            <View style={styles.card}>
+                <HomeCard
+                    panHandlers={this._panResponder.panHandlers}
+                    title={"Últimos eventos"}
+                    footerText={"atualizado em 20/05/2018"}/>
+            </View>
+        );
     }
 
     renderPlaceControl = () => {
-
+        return(
+            <View style={styles.card}>
+                <HomeCard
+                    panHandlers={this._panResponder.panHandlers}
+                    title={"Últimos eventos"}
+                    footerText={"atualizado em 20/05/2018"} />
+            </View>
+        );
     };
 
     renderDoorLocks = () => {
-
+        return(
+            <View style={styles.card}>
+                <HomeCard 
+                    panHandlers={this._panResponder.panHandlers}
+                    title={"Últimos eventos"} 
+                    footerText={"atualizado em 20/05/2018"} />
+            </View>
+        );
     };
 
     renderHeader = () => {
@@ -51,9 +108,36 @@ class HomeScreen extends Component {
         );
     };
 
+    renderWelcome = () => {
+        return(
+            <View style={styles.welcomeView}>
+                <Text style={styles.welcomeText}>Bem-vindo, { this.state.loggedUser.name }</Text>
+            </View>
+        );
+    };
+
     renderBody = () => {
         return (
             <View style={styles.body}>
+                <ScrollView ref={(e) => { this.fScroll = e }} >
+                    { this.renderWelcome() }
+                    { this.renderTopAction() }
+                    { this.renderPlaceControl() }
+                    { this.renderDoorLocks() }
+                    { this.renderLastEvents() }
+                </ScrollView>
+            </View>
+        );
+    };
+
+    renderTopAction = () => {
+        return(
+            <View style={styles.action}>
+                <HomeButton 
+                    sourceImg={imgNetwork} 
+                    title={"Conectar módulo a rede"}
+                    onPress={() => this.props.navigation.navigate(constNavigation.insertCredentialsScreen.route)}/>
+                <HomeButton />
             </View>
         );
     };
@@ -98,12 +182,21 @@ const styles = StyleSheet.create({
         color: 'white'
     },
     card: {
-        margin: 5,
-        height: 100,
-        backgroundColor: 'rgba(0, 164, 211, 0.5)',
-        padding: 20,
-        borderRadius: 5,
+        margin: 5
+    },
+    action: {
         flexDirection: 'row',
+        alignItems: 'center',
+        alignSelf: 'center'
+    },
+    welcomeView: {
+        margin: 10,
+        marginTop: 20,
+        alignItems: 'center',
+        alignSelf: 'center'
+    },
+    welcomeText: {
+        fontSize: 18
     }
 });
 export default HomeScreen;

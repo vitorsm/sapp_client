@@ -41,7 +41,8 @@ class InsertObjectScreen extends Component {
     //this.state.isKeyboardHide
     //super.componentDidMount
     //super.componentWillMount
-
+    //getObjectScreenBack() { object: {}, edit: true }
+    
     componentWillMount() {
 
       if (this.props.crudMode != undefined) {
@@ -210,9 +211,10 @@ class InsertObjectScreen extends Component {
             <NavBar 
               navigation={this.props.navigation}
               menuText={this.state.title}
-              buttonView={ buttonView.backWithoutFilter }
-              screenBack={ this.getScreenBack() }
-              showButton={ true } />
+              buttonView={buttonView.backWithoutFilter}
+              screenBack={this.getScreenBack()}
+              showButton={true}
+              objectScreenBack={this.getObjectScreenBack()} />
     
             <View style={styles.container} >
               { this.renderInputs() }

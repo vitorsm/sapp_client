@@ -19,7 +19,8 @@ const closeImg = require('../../imgs/close.png');
 export const buttonView = {
   menu: 1,
   back: 2,
-  backWithoutFilter: 3
+  backWithoutFilter: 3,
+  menuWithoutFilter: 4
 };
 const appName = "SAPP Client";
 
@@ -73,7 +74,10 @@ class NavBar extends Component {
   handleClickMenuButton = () => {
     if (this.state.buttonView == buttonView.backWithoutFilter ||
       this.state.buttonView == buttonView.back) {
-      this.props.navigation.navigate(this.props.screenBack);
+      if (this.props.objectScreenBack !== undefined)
+        this.props.navigation.navigate(this.props.screenBack, this.props.objectScreenBack);
+      else
+        this.props.navigation.navigate(this.props.screenBack);
     } else {
       this.props.navigation.openDrawer();
     }
@@ -96,7 +100,7 @@ class NavBar extends Component {
   };
 
   renderFilterButton = () => {
-    if (this.state.buttonView == buttonView.backWithoutFilter) {
+    if (this.state.buttonView === buttonView.backWithoutFilter || this.state.buttonView === buttonView.menuWithoutFilter) {
       return null;
     } else {
       return(
@@ -122,7 +126,8 @@ class NavBar extends Component {
       <View style={styles.menuButtonView}>
         <TouchableOpacity onPress = { this.handleClickMenuButton } disabled={!this.state.showButton}>
           <Image 
-            source={ this.state.buttonView == buttonView.menu ? menuImg : backImg }
+            source={ this.state.buttonView === buttonView.menu || this.state.buttonView === buttonView.menuWithoutFilter
+              ? menuImg : backImg }
             style={styles.menuImg} />
         </TouchableOpacity>
       </View>

@@ -14,6 +14,7 @@ import RfIdCardsScreen from './components/rfIdCards/RfIdCardsScreen';
 import RfIdCardsInsertScreen from './components/rfIdCards/RfIdCardsInsertScreen';
 import InsertControlModuleScreen from './components/controlModules/InsertControlModuleScreen';
 import InsertEventScreen from './components/events/InsertEventScreen';
+import InsertCredentialsScreen from './components/controlModules/InsertCredentialsScreen';
 
 const navigationOptionsHide = ({ navigation }) => ({
     drawerLabel: () => null
@@ -84,6 +85,11 @@ export const constNavigation = {
     insertEvent: {
         route: 'insertEvent',
         screen: InsertEventScreen,
+        navigationOptions: navigationOptionsHide
+    },
+    insertCredentialsScreen: {
+        route: 'insertCredentialsScreen',
+        screen: InsertCredentialsScreen,
         navigationOptions: navigationOptionsHide
     }
 };

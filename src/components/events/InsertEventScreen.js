@@ -98,6 +98,10 @@ class InsertEventScreen extends InsertObjectScreen {
         return constNavigation.events.route;
     };
 
+    getObjectScreenBack = () => {
+        return null;
+    };
+    
     handleChangeActive = (value) => {
         let object = this.state.object;
         object.active = value;

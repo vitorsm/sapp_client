@@ -120,6 +120,10 @@ class InsertPlaceScreen extends Component {
             navScreenBack : constNavigation.places.route;
     };
 
+    getObjectScreenBack = () => {
+        return null;
+    };
+    
     handleChangeName = (text) => {
         let place = this.state.place;
         place.name = text;

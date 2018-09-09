@@ -115,6 +115,10 @@ class InsertUserScreen extends Component {
       navScreenBack : constNavigation.users.route;
   };
 
+  getObjectScreenBack = () => {
+    return null;
+  };
+
   handleChangeName = (text) => {
     let user = this.state.user;
     user.name = text;

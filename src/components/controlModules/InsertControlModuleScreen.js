@@ -88,6 +88,10 @@ class InsertControlModuleScreen extends InsertObjectScreen {
         return constNavigation.controlModules.route;
     };
 
+    getObjectScreenBack = () => {
+        return null;
+    };
+    
     handleChangeDescription = (text) => {
         let object = this.state.object;
         object.description = text;
