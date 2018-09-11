@@ -65,7 +65,7 @@ class NavBar extends Component {
   }
 
   handleClickSearchButton = () => {
-    if (this.state.searchMode)
+    if (this.state.searchMode && this.props.onChangeText !== undefined)
       this.props.onChangeText(null);
     
     this.setState( { searchMode: !this.state.searchMode } );
@@ -74,10 +74,23 @@ class NavBar extends Component {
   handleClickMenuButton = () => {
     if (this.state.buttonView == buttonView.backWithoutFilter ||
       this.state.buttonView == buttonView.back) {
-      if (this.props.objectScreenBack !== undefined)
-        this.props.navigation.navigate(this.props.screenBack, this.props.objectScreenBack);
-      else
+      
+      console.log("obj q vai: ", this.props.objectBackupReturn);
+
+      if (this.props.onPressBack !== undefined)
+        this.props.onPressBack();
+      
+      let objectScreenBack = this.props.objectScreenBack;
+      if (objectScreenBack !== undefined && objectScreenBack !== null) {
+        // { objParent, objEdit, objReturn, value, isEditing } pega o objReturn e trabalha 
+        objectScreenBack.objEdit = undefined;
+        objectScreenBack.objReturn = this.props.objectBackupReturn;
+        console.log("obj q vai real: ", objectScreenBack);
+        this.props.navigation.navigate(this.props.screenBack, { object: objectScreenBack } );
+      } else {
         this.props.navigation.navigate(this.props.screenBack);
+      }
+
     } else {
       this.props.navigation.openDrawer();
     }
@@ -142,7 +155,7 @@ class NavBar extends Component {
           placeholder={"Pesquisa..."} 
           value={this.state.textSearch}
           style={styles.search}
-          onChangeText={this.props.onChangeText}
+          onChangeText={this.props.onChangeText !== undefined ? this.props.onChangeText : () => {} }
           placeholderTextColor={"white"}
           underlineColorAndroid={"white"} />
       );

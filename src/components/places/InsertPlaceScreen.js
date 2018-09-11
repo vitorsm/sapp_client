@@ -1,62 +1,34 @@
 import React, { Component } from 'react';
 import {
-  StyleSheet,
   Text,
   View,
-  Image,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  Button,
-  Keyboard
+  ScrollView
 } from 'react-native';
-import NavBar, { buttonView } from '../NavBar';
-import Constants, { 
-  constNavigation,
-  colors,
-  saveImg,
-  cancelImg,
-  editImg
-} from '../../Constants';
+import Constants, { constNavigation } from '../../Constants';
+import InsertObjectScreen, { crudMode, styles } from '../crud/InsertObjectScreen';
 
-export const crudMode = {
-  view: 1,
-  edit: 2
-};
-
-class InsertPlaceScreen extends Component {
-
+class InsertPlaceScreen extends InsertObjectScreen {
     constructor(props) {
         super(props);
     
         this.state = {
-            place: null,
-            backupPlace: null,
+            object: null,
+            backupObject: null,
             crudMode: crudMode.view,
             isKeyboardHide: true,
-            showBackButton: true
+            showBackButton: true,
+            objectBack: null
         };
     }
 
     componentWillMount() {
-
-        if (this.props.crudMode != undefined) {
-            this.setState( { crudMode: this.props.crudMode } );
-        }
-        let place = this.props.navigation.getParam('place', null);
-        
-        this.setPlace(place);
+        super.componentWillMount();
     }
 
     componentDidMount() {
-        if (this.keyboardDidShowListener !== undefined)
-            this.keyboardDidShowListener.remove();
-
-        if (this.keyboardDidShowListener !== undefined)
-            this.keyboardDidHideListener.remove();
-
-        this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => this.setState( { isKeyboardHide: false } ));
-        this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => this.setState( { isKeyboardHide: true } ));
+        super.componentDidMount();
     }
 
     componentWillReceiveProps(nextProps) {
@@ -64,12 +36,12 @@ class InsertPlaceScreen extends Component {
         if (this.props.crudMode !== nextProps.crudMode) {
             this.setState( { crudMode: nextProps.crudMode } );
         } else if (this.props.place !== nextProps.place) {
-            this.setPlace(nextProps.place);
+            this.setObject(nextProps.place);
         }
 
     }
 
-    setPlace = (placeReceived) => {
+    setObject = (placeReceived) => {
         let place;
         let isNull = false;
 
@@ -95,19 +67,19 @@ class InsertPlaceScreen extends Component {
         };
 
         if (isNull) {
-            this.setState( { place, backupPlace, crudMode: crudMode.edit } );
+            this.setState( { object: place, backupObject: backupPlace, crudMode: crudMode.edit } );
         } else {
-            this.setState( { place, backupPlace } );
+            this.setState( { object: place, backupObject: backupPlace } );
         }
     };
 
     restoreBackupObject = () => {
         let place = {
-            id: this.state.backupPlace.id,
-            name: this.state.backupPlace.name,
-            description: this.state.backupPlace.description,
-            area: this.state.backupPlace.area,
-            parentPlace: this.state.backupPlace.parentPlace
+            id: this.state.backupObject.id,
+            name: this.state.backupObject.name,
+            description: this.state.backupObject.description,
+            area: this.state.backupObject.area,
+            parentPlace: this.state.backupObject.parentPlace
         };
 
         this.setState({ place });
@@ -119,25 +91,25 @@ class InsertPlaceScreen extends Component {
         return navScreenBack !== null ? 
             navScreenBack : constNavigation.places.route;
     };
-
-    getObjectScreenBack = () => {
-        return null;
-    };
     
+    setObjectScreenBack = (objectBack) => {
+        this.setState({ objectBack });
+    }
+
     handleChangeName = (text) => {
-        let place = this.state.place;
+        let place = this.state.object;
         place.name = text;
         this.setState( { place } );
     };
 
     handleChangeDescription = (text) => {
-        let place = this.state.place;
+        let place = this.state.object;
         place.description = text;
         this.setState( { place } );
     };
 
     handleChangeArea = (text) => {
-        let place = this.state.place;
+        let place = this.state.object;
         place.area = text;
         this.setState( { place } );
     };
@@ -147,7 +119,7 @@ class InsertPlaceScreen extends Component {
     };
 
     handleClickSaveButton = () => {
-        this.setPlace(this.state.place);
+        this.setObject(this.state.object);
         this.setState( { crudMode: crudMode.view, showBackButton: true } );
     };
 
@@ -156,110 +128,17 @@ class InsertPlaceScreen extends Component {
         this.setState( { crudMode: crudMode.view, showBackButton: true } );
     };
 
-    renderNameHeader = () => {
-        if (this.state.crudMode === crudMode.view) {
-            return(
-            <Text style={styles.textName}>
-                { this.state.place.name }
-            </Text>
-            );
-        } else if (this.state.crudMode == crudMode.edit) {
-            return(
-            <TextInput 
-                style={styles.textNameEdit} 
-                value={ this.state.place.name }
-                onChangeText={this.handleChangeName}
-                placeholder={"Insira o nome do local"}
-                placeholderTextColor={"white"}
-                underlineColorAndroid={"white"} />
-            );
-        }
-    };
-
-    renderId = () => {
-        if (this.state.crudMode != crudMode.view) return null;
-
-        return(
-            <View style={{ flexDirection: 'row' }}>
-            <Text style={ this.state.crudMode == crudMode.view ? styles.textId : styles.textIdEdit }>
-                { this.state.place.id }
-            </Text>
-
-            {/* separator */}
-            <View style={{ 
-                backgroundColor: 'white', 
-                height: 55, 
-                width: 2 }} />
-            </View>
-        );
-    };
-
-    renderHeader = () => {
-        return(
-            <View style={ styles.header } >
-            { this.renderId() }
-            { this.renderNameHeader() }
-            </View>
-        );
-    };
-
-    renderViewActions = () => {
-        return(
-            <View style={styles.actions}>
-
-            <TouchableOpacity 
-                style={styles.actionsButton}
-                onPress={this.handleClickEditButton}>
-                <Image source={editImg} style={styles.imgButtons}/>
-            </TouchableOpacity>
-
-            </View>
-        );
-    };
-
-
-    renderEditActions = () => {
-        return(
-            <View style={styles.actions}>
-
-            <TouchableOpacity 
-                style={styles.actionsButton} 
-                onPress={this.handleClickCancelButton}>
-                <Image source={cancelImg} style={styles.imgButtons}/>
-            </TouchableOpacity>
-
-            <TouchableOpacity 
-                style={styles.actionsButton}
-                onPress={this.handleClickSaveButton}>
-                <Image source={saveImg} style={styles.imgButtons}/>
-            </TouchableOpacity>
-
-            </View>
-        );
-    };
-
-    renderActions = () => {
-        if (!this.state.isKeyboardHide) return null;
-
-        if (this.state.crudMode == crudMode.view) {
-            return this.renderViewActions();
-        } else if (this.state.crudMode == crudMode.edit) {
-            return this.renderEditActions();
-        }
-    };
 
     renderBody = () => {
 
         return(
-          <View style={styles.body}>
-            
             <ScrollView>
               
               <Text style={styles.inputLabel}>Descrição</Text>
               <TextInput 
                 placeholder={"Insira uma descrição do local"}
                 style={styles.input}
-                value={this.state.place.description}
+                value={this.state.object.description}
                 onChangeText={this.handleChangeDescription}
                 editable={this.state.crudMode == crudMode.edit} />
     
@@ -267,7 +146,7 @@ class InsertPlaceScreen extends Component {
               <TextInput 
                 placeholder={"Insira um valor para área"}
                 style={styles.input} 
-                value={this.state.place.area}
+                value={this.state.object.area}
                 onChangeText={this.handleChangeArea}
                 editable={this.state.crudMode == crudMode.edit} />
                 
@@ -278,111 +157,9 @@ class InsertPlaceScreen extends Component {
                 </TouchableOpacity>
     
             </ScrollView>
-    
-          </View>
         );
     };
-
-    renderInputs = () => {
-        return(
-          <View style={{ flex: 1 }}>
-            { this.renderHeader() }
-            { this.renderBody() }
-          </View>
-        );
-    };
-
-    render() {
-    
-        return (
-          <View style={{ flex: 1 }}>
-            
-            <NavBar 
-              navigation={this.props.navigation}
-              menuText={"Cadastrar Local"}
-              buttonView={ buttonView.backWithoutFilter }
-              screenBack={ this.getScreenBack() }
-              showButton={ this.state.showBackButton } />
-    
-            <View style={styles.container} >
-              { this.renderInputs() }
-              { this.renderActions() }
-            </View>
-    
-          </View>
-        );
-    }
 
 }
-
-const styles = StyleSheet.create({
-    container: {
-      flex: 1
-    },
-    header: {
-      flex: 1,
-      flexDirection: 'row',
-      backgroundColor: '#00a4d3',
-      alignSelf: 'stretch',
-      alignItems: 'center',
-      justifyContent: 'center'
-      // backgroundColor: colors.backgroundMain
-    },
-    textId: {
-      fontSize: 24,
-      margin: 20,
-      color: 'white'
-    },
-    textName: {
-      fontSize: 24,
-      margin: 20,
-      color: 'white',
-      flex: 1
-    },
-    textNameEdit: {
-      fontSize: 16,
-      margin: 2,
-      color: 'white',
-      flex: 1
-    },
-    body: {
-      flex: 5,
-      alignSelf: 'stretch'
-    },
-    inputLabel: {
-      marginLeft: 20,
-      marginTop: 20,
-      marginBottom: 10
-    },
-    input: {
-      marginLeft: 20,
-      marginRight: 40
-    },
-    actions: {
-      flexDirection: 'row',
-      margin: 0,
-      justifyContent: 'center',
-      backgroundColor: '#00a4d3'
-    },
-    actionsButton: {
-      margin: 15
-    },
-    touchButton: {
-      backgroundColor: '#00a4d3',
-      margin: 20,
-      padding: 20,
-      borderRadius: 5,
-      alignItems: 'center'
-    },
-    buttons: {
-      color: 'white',
-      fontSize: 14
-    },
-    imgButtons: {
-      width: 40,
-      height: 40
-    }
-  });
-
   
 export default InsertPlaceScreen;

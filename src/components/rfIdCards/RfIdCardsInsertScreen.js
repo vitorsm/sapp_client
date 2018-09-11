@@ -22,7 +22,8 @@ class RfIdCardInsertScreen extends InsertObjectScreen {
             object: null,
             backupObject: null,
             crudMode: crudMode.view,
-            description: " do cartão"
+            description: " do cartão",
+            objectBack: null
         };
 
     }
@@ -86,10 +87,10 @@ class RfIdCardInsertScreen extends InsertObjectScreen {
         return constNavigation.rfIdCards.route;
     };
 
-    getObjectScreenBack = () => {
-        return null;
-    };
-
+    setObjectScreenBack = (objectBack) => {
+        this.setState({ objectBack });
+    }
+    
     handleChangeDescription = (text) => {
         let object = this.state.object;
         object.description = text;

@@ -13,25 +13,32 @@ import {
 import { DrawerNavigator, DrawerItems } from 'react-navigation';
 import LoginScreen from './src/components/login/LoginScreen';
 import Constants, { constNavigation } from './src/Constants';
-
+// import DrawerMenu from './src/components/drawerMenu/DrawerMenu';
 const accountIcon = require('./imgs/account.png');
 const exitIcon = require('./imgs/exit.png');
+
+
 
 export default class sapp_client extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      token: "null"
+      token: null
     };
+
   }
 
   setToken = (token) => {
     this.setState( { token } );
+    // console.log(this.state.token);
+    // this.state.token = token;
+    // console.log(this.state.token);
   }
 
   setLogoff = () => {
-    this.setState( { token: null } );
+    // this.setState( { token: null } );
+    this.setToken(null);
     alert("logoff");
   };
 
@@ -49,7 +56,7 @@ export default class sapp_client extends Component {
 
   render() {
 
-    if (this.state.token == null) {
+    if (this.state.token === null) {
       return this.renderLogin();
     } else {
       return this.renderNavigation();
@@ -58,7 +65,12 @@ export default class sapp_client extends Component {
   }
 }
 
-const DrawerMenu = (props) => {
+const DrawerMenu = (props, test, test2, test3) => {
+  // console.log("props", props);
+  console.log(props);
+  console.log(test);
+  console.log(test2);
+
   return (
     <ScrollView style = {{ flex: 1 }}>
       <TouchableOpacity onPress={ () => { alert("clicou na coisa de ver conta do usuario") }}>
@@ -69,8 +81,7 @@ const DrawerMenu = (props) => {
           </View>
         </View>
       </TouchableOpacity>
-      
-      
+
       <View>
         <DrawerItems {...props} />
       </View>
@@ -86,17 +97,35 @@ const DrawerMenu = (props) => {
   );
 };
 
+// const MyApp = DrawerNavigator(
+//   constNavigation
+//   ,{
+//   initialRouteName: 'home',
+//   drawerPosition: 'left',
+//   contentComponent: DrawerMenu,
+//   drawerOpenRoute: 'DrawerOpen',
+//   drawerCloseRoute: 'DrawerClose',
+//   drawerToggleRoute: 'DrawerToggle',
+//   animationEnabled: 'true'
+// });
+
 const MyApp = DrawerNavigator(
-  constNavigation
-  ,{
-  initialRouteName: 'about',
-  drawerPosition: 'left',
-  contentComponent: DrawerMenu,
-  drawerOpenRoute: 'DrawerOpen',
-  drawerCloseRoute: 'DrawerClose',
-  drawerToggleRoute: 'DrawerToggle',
-  animationEnabled: 'true'
-});
+  constNavigation,
+  {
+    initialRouteName: 'home',
+    drawerPosition: 'left',
+    // contentComponent: DrawerMenu,
+    contentComponent: DrawerMenu,
+    drawerOpenRoute: 'DrawerOpen',
+    drawerCloseRoute: 'DrawerClose',
+    drawerToggleRoute: 'DrawerToggle',
+    animationEnabled: 'true',
+    contentOptions: {
+      test: "teste"
+    }
+  },
+  "teste"
+);
 
 const styles = StyleSheet.create({
   exitMenuView: {

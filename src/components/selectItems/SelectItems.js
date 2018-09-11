@@ -13,6 +13,11 @@ import ItemList from './ItemList';
 const defualtBackgroundColor = '#BDBDBD';
 const defaultAmountShowFilter = 2;
 
+export const selectMode = {
+    listMode: 1,
+    screenMode: 2
+};
+
 class SelectItems extends Component {
 
     constructor(props) {
@@ -31,7 +36,8 @@ class SelectItems extends Component {
             backgroundColor: defualtBackgroundColor,
             amountShowFilter: defaultAmountShowFilter,
             textSearch: null,
-            textAddButton: null
+            textAddButton: null,
+            mode: selectMode.listMode
         };
     }
 
@@ -46,7 +52,8 @@ class SelectItems extends Component {
             backgroundColor: this.props.backgroundColor !== undefined ? this.props.backgroundColor : defualtBackgroundColor,
             title: this.props.title,
             amountShowFilter: this.props.amountShowFilter !== undefined && this.props.amountShowFilter !== null ? this.props.amountShowFilter : defaultAmountShowFilter,
-            textAddButton: this.props.textAddButton
+            textAddButton: this.props.textAddButton,
+            mode: this.props.mode !== undefined && this.props.mode !== null ? this.props.mode : selectMode.listMode
          } );
     }
 
@@ -89,6 +96,9 @@ class SelectItems extends Component {
         if (nextProps.textAddButton !== this.props.textAddButton) {
             this.setState( { textAddButton: nextProps.textAddButton } );
         }
+        if (nextProps.mode !== this.props.mode) {
+            this.setState( { mode: nextProps.mode !== undefined && nextProps.mode !== null ? nextProps.mode : selectMode.listMode } );
+        }
     }
 
     copyItems = (list) => {
@@ -113,22 +123,25 @@ class SelectItems extends Component {
 
     handleClickItem = (item) => {
 
-        if (!this.state.multipleSelection) {
-            let list = [item];
-            this.props.okOnPress(list);
+        if (this.state.mode === selectMode.listMode) {
+            if (!this.state.multipleSelection) {
+                let list = [item];
+                this.props.okOnPress(list);
+            }
+    
+            let list = this.state.selectedItems;
+            let index = list.indexOf(item);
+    
+            if (index >= 0) {
+                list.splice(index, 1);
+            } else {
+                list.push(item);
+            }
+    
+            this.setState( { selectedItems: list });
+        } else if (this.state.mode === selectMode.screenMode) {
+            this.props.onPressItem(item);
         }
-
-        let list = this.state.selectedItems;
-
-        let index = list.indexOf(item);
-
-        if (index >= 0) {
-            list.splice(index, 1);
-        } else {
-            list.push(item);
-        }
-
-        this.setState( { selectedItems: list });
     };
 
     handleChangeTextSearch = (text) => {
@@ -137,11 +150,12 @@ class SelectItems extends Component {
         this.state.items.filter(item => item.name.toUpperCase().includes(text.toUpperCase()))
         .map(item => itemsFiltered.push(item));
 
+        alert("filtrados: " + itemsFiltered.length);
         this.setState( { itemsFiltered } );
     };
 
     renderSelectAll = () => {
-        if (!this.state.multipleSelection) return null;
+        if (!this.state.multipleSelection || this.state.mode === selectMode.screenMode) return null;
         let text = "Remover seleção";
 
         if (this.state.items.length !== this.state.selectedItems.length) {
@@ -156,7 +170,7 @@ class SelectItems extends Component {
     };
 
     renderFilter = () => {
-        if (this.state.items.length < this.state.amountShowFilter) return null;
+        if (this.state.items.length < this.state.amountShowFilter || this.state.mode === selectMode.screenMode) return null;
 
         return(
             <TextInput 
@@ -191,10 +205,10 @@ class SelectItems extends Component {
     renderItems = () => {
         if (this.state.itemsFiltered === undefined || this.state.itemsFiltered === null) return null;
 
-        return this.state.itemsFiltered.map( item => {
+        return this.state.itemsFiltered.map( (item, i) => {
             return (
                 <ItemList
-                    key={item.id}
+                    key={i}
                     selected={this.state.selectedItems.includes(item)}
                     item={item}
                     onPress={() => { this.handleClickItem(item); }} />
@@ -213,7 +227,7 @@ class SelectItems extends Component {
     };
 
     renderOkButtun = () => {
-        if (!this.state.multipleSelection) return null;
+        if (!this.state.multipleSelection || this.state.mode === selectMode.screenMode) return null;
 
         return(
             <TouchableOpacity 
@@ -225,13 +239,14 @@ class SelectItems extends Component {
     };
 
     renderBottom = () => {
+
         return (
             <View style={styles.bottom}>
 
                 <TouchableOpacity 
                     style={styles.cancelButtonView}
                     onPress={() => { this.props.cancelOnPress(this.state.backupSelectedItems); }}>
-                    <Text style={styles.cancelButtonText}>Cancelar</Text>
+                    <Text style={styles.cancelButtonText}>{ this.state.mode === selectMode.listMode ? "Cancelar" : "Fechar"}</Text>
                 </TouchableOpacity>
 
                 { this.renderOkButtun() }

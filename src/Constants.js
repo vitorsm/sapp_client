@@ -1,6 +1,6 @@
 
 import HomeScreen from './components/home/HomeScreen';
-import SettingsScreen from './components/settings/SettingsScreen';
+// import SettingsScreen from './components/settings/SettingsScreen';
 import UsersScreen from './components/users/UsersScreen';
 import ControlModulesScreen from './components/controlModules/ControlModulesScreen';
 import PlacesScreen from './components/places/PlacesScreen';
@@ -15,6 +15,7 @@ import RfIdCardsInsertScreen from './components/rfIdCards/RfIdCardsInsertScreen'
 import InsertControlModuleScreen from './components/controlModules/InsertControlModuleScreen';
 import InsertEventScreen from './components/events/InsertEventScreen';
 import InsertCredentialsScreen from './components/controlModules/InsertCredentialsScreen';
+import InsertInstrumentScreen from './components/controlModules/InsertInstrumentScreen';
 
 const navigationOptionsHide = ({ navigation }) => ({
     drawerLabel: () => null
@@ -48,10 +49,6 @@ export const constNavigation = {
     places: {
         route: 'places',
         screen: PlacesScreen
-    },
-    settings: {
-        route: 'settings',
-        screen: SettingsScreen
     },
     about: {
         route: 'about',
@@ -91,6 +88,11 @@ export const constNavigation = {
         route: 'insertCredentialsScreen',
         screen: InsertCredentialsScreen,
         navigationOptions: navigationOptionsHide
+    },
+    insertInstrumentScreen: {
+        route: 'insertInstrumentScreen',
+        screen: InsertInstrumentScreen,
+        navigationOptions: navigationOptionsHide
     }
 };
 
@@ -107,6 +109,7 @@ export const editImg = require('../imgs/edit.png');
 export const addImg = require('../imgs/add.png');
 export const closeImg = require('../imgs/close.png');
 export const refreshImg = require('../imgs/refresh.png');
+export const deleteImg = require('../imgs/delete.png');
 class Constants {
     
 }

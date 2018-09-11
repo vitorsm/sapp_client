@@ -18,46 +18,22 @@ import Constants, {
   cancelImg,
   editImg
 } from '../../Constants';
+import InsertObjectScreen, { crudMode, styles } from '../crud/InsertObjectScreen';
 
-export const crudMode = {
-  view: 1,
-  edit: 2
-};
-
-class InsertUserScreen extends Component {
+class InsertUserScreen extends InsertObjectScreen {
 
   constructor(props) {
     super(props);
 
     this.state = {
-      user: null,
-      backupUser: null,
+      object: null,
+      backupObject: null,
       crudMode: crudMode.view,
       isKeyboardHide: true,
-      showBackButton: true
+      showBackButton: true,
+      objectBack: null
     };
 
-  }
-
-  componentWillMount() {
-
-    if (this.props.crudMode != undefined) {
-      this.setState( { crudMode: this.props.crudMode } );
-    }
-    let user = this.props.navigation.getParam('user', null);
-    
-    this.setUser(user);
-  }
-
-  componentDidMount() {
-    if (this.keyboardDidShowListener !== undefined)
-      this.keyboardDidShowListener.remove();
-
-    if (this.keyboardDidShowListener !== undefined)
-      this.keyboardDidHideListener.remove();
-
-    this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => this.setState( { isKeyboardHide: false } ));
-    this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => this.setState( { isKeyboardHide: true } ));
   }
 
   componentWillReceiveProps(nextProps) {
@@ -65,12 +41,12 @@ class InsertUserScreen extends Component {
     if (this.props.crudMode !== nextProps.crudMode) {
       this.setState( { crudMode: nextProps.crudMode } );
     } else if (this.props.user !== nextProps.user) {
-      this.setUser(nextProps.user);
+      this.setObject(nextProps.user);
     }
 
   }
 
-  setUser = (userReceived) => {
+  setObject = (userReceived) => {
     let user;
     let isNull = false;
     if (userReceived === null) {
@@ -91,21 +67,21 @@ class InsertUserScreen extends Component {
       password: user.password
     };
     if (isNull) {
-      this.setState( { user, backupUser, crudMode: crudMode.edit } );
+      this.setState( { object: user, backupObject: backupUser, crudMode: crudMode.edit } );
     } else {
-      this.setState( { user, backupUser } );
+      this.setState( { object: user, backupObject: backupUser } );
     }
   };
 
   restoreBackupObject = () => {
     let user = {
-      id: this.state.backupUser.id,
-      name: this.state.backupUser.name,
-      login: this.state.backupUser.login,
-      password: this.state.backupUser.password
+      id: this.state.backupObject.id,
+      name: this.state.backupObject.name,
+      login: this.state.backupObject.login,
+      password: this.state.backupObject.password
     };
 
-    this.setState({ user });
+    this.setState({ object: user });
   };
 
   getScreenBack = () => {
@@ -115,24 +91,24 @@ class InsertUserScreen extends Component {
       navScreenBack : constNavigation.users.route;
   };
 
-  getObjectScreenBack = () => {
-    return null;
-  };
-
+  setObjectScreenBack = (objectBack) => {
+    this.setState({ objectBack });
+  }
+  
   handleChangeName = (text) => {
-    let user = this.state.user;
+    let user = this.state.object;
     user.name = text;
     this.setState( { user } );
   };
 
   handleChangeLogin = (text) => {
-    let user = this.state.user;
+    let user = this.state.object;
     user.login = text;
     this.setState( { user } );
   };
 
   handleChangePassword = (text) => {
-    let user = this.state.user;
+    let user = this.state.object;
     user.password = text;
     this.setState( { user } );
   };
@@ -142,7 +118,7 @@ class InsertUserScreen extends Component {
   }
 
   handleClickSaveButton = () => {
-    this.setUser(this.state.user);
+    this.setObject(this.state.object);
     this.setState( { crudMode: crudMode.view, showBackButton: true } );
   }
 
@@ -155,14 +131,14 @@ class InsertUserScreen extends Component {
     if (this.state.crudMode === crudMode.view) {
       return(
         <Text style={styles.textName}>
-          { this.state.user.name }
+          { this.state.object.name }
         </Text>
       );
     } else if (this.state.crudMode == crudMode.edit) {
       return(
         <TextInput 
           style={styles.textNameEdit} 
-          value={ this.state.user.name }
+          value={ this.state.object.name }
           onChangeText={this.handleChangeName}
           placeholder={"Insira o nome do usuário"}
           placeholderTextColor={"white"}
@@ -177,7 +153,7 @@ class InsertUserScreen extends Component {
     return(
       <View style={{ flexDirection: 'row' }}>
         <Text style={ this.state.crudMode == crudMode.view ? styles.textId : styles.textIdEdit }>
-          { this.state.user.id }
+          { this.state.object.id }
         </Text>
 
         {/* separator */}
@@ -244,16 +220,14 @@ class InsertUserScreen extends Component {
 
   renderBody = () => {
 
-    return(
-      <View style={styles.body}>
-        
+    return(        
         <ScrollView>
           
           <Text style={styles.inputLabel}>Login</Text>
           <TextInput 
             placeholder={"Insira o login do usuário"}
             style={styles.input}
-            value={this.state.user.login}
+            value={this.state.object.login}
             onChangeText={this.handleChangeLogin}
             editable={this.state.crudMode == crudMode.edit} />
 
@@ -261,7 +235,7 @@ class InsertUserScreen extends Component {
           <TextInput 
             placeholder={"Insira uma senha para o usuário"}
             style={styles.input} 
-            value={this.state.user.password}
+            value={this.state.object.password}
             onChangeText={this.handleChangePassword}
             editable={this.state.crudMode == crudMode.edit} />
             
@@ -272,109 +246,9 @@ class InsertUserScreen extends Component {
             </TouchableOpacity>
 
         </ScrollView>
-
-      </View>
     );
   };
 
-  renderInputs = () => {
-    return(
-      <View style={{ flex: 1 }}>
-        { this.renderHeader() }
-        { this.renderBody() }
-      </View>
-    );
-  };
-
-  render() {
-    
-    return (
-      <View style={{ flex: 1 }}>
-        
-        <NavBar 
-          navigation={this.props.navigation}
-          menuText={"Cadastrar Usuário"}
-          buttonView={ buttonView.backWithoutFilter }
-          screenBack={ this.getScreenBack() }
-          showButton={ this.state.showBackButton } />
-
-        <View style={styles.container} >
-          { this.renderInputs() }
-          { this.renderActions() }
-        </View>
-
-      </View>
-    );
-  }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  header: {
-    flex: 1,
-    flexDirection: 'row',
-    backgroundColor: '#00a4d3',
-    alignSelf: 'stretch',
-    alignItems: 'center',
-    justifyContent: 'center'
-    // backgroundColor: colors.backgroundMain
-  },
-  textId: {
-    fontSize: 24,
-    margin: 20,
-    color: 'white'
-  },
-  textName: {
-    fontSize: 24,
-    margin: 20,
-    color: 'white',
-    flex: 1
-  },
-  textNameEdit: {
-    fontSize: 16,
-    margin: 2,
-    color: 'white',
-    flex: 1
-  },
-  body: {
-    flex: 5,
-    alignSelf: 'stretch'
-  },
-  inputLabel: {
-    marginLeft: 20,
-    marginTop: 20,
-    marginBottom: 10
-  },
-  input: {
-    marginLeft: 20,
-    marginRight: 40
-  },
-  actions: {
-    flexDirection: 'row',
-    margin: 0,
-    justifyContent: 'center',
-    backgroundColor: '#00a4d3'
-  },
-  actionsButton: {
-    margin: 15
-  },
-  touchButton: {
-    backgroundColor: '#00a4d3',
-    margin: 20,
-    padding: 20,
-    borderRadius: 5,
-    alignItems: 'center'
-  },
-  buttons: {
-    color: 'white',
-    fontSize: 14
-  },
-  imgButtons: {
-    width: 40,
-    height: 40
-  }
-});
 
 export default InsertUserScreen

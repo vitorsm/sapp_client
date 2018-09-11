@@ -9,6 +9,7 @@ import {
 import InsertObjectScreen, { styles, crudMode } from '../crud/InsertObjectScreen';
 import Constants, { constNavigation } from '../../Constants';
 import DropdownSelectItems from '../selectItems/DropdownSelectItems';
+import DropdownSelectItemsScreen from '../selectItems/DropdownSelectItemsScreen';
 
 class InsertControlModuleScreen extends InsertObjectScreen {
 
@@ -21,7 +22,8 @@ class InsertControlModuleScreen extends InsertObjectScreen {
             object: null,
             backupObject: null,
             description: " do módulo",
-            isKeyboardHide: true
+            isKeyboardHide: true,
+            objectBack: null
         };
     }
 
@@ -51,7 +53,9 @@ class InsertControlModuleScreen extends InsertObjectScreen {
                 description: null,
                 place: null,
                 login: null,
-                password: null
+                password: null,
+                // instruments: []
+                instruments: [{ id: 1, name: "teste" },{ id: 2, name: "teste2"}]
             };
         }
 
@@ -61,9 +65,9 @@ class InsertControlModuleScreen extends InsertObjectScreen {
             description: controlModule.description,
             place: controlModule.place,
             login: controlModule.login,
-            password: controlModule.password
+            password: controlModule.password,
+            instruments: controlModule.instruments
         };
-
 
         if (isNull) {
             this.setState( { object: controlModule, backupObject: controlModuleBackup, crudMode: crudMode.edit } );
@@ -88,10 +92,36 @@ class InsertControlModuleScreen extends InsertObjectScreen {
         return constNavigation.controlModules.route;
     };
 
-    getObjectScreenBack = () => {
-        return null;
-    };
+    setObjectScreenBack = (objectBack) => {
+        this.setState({ objectBack });
+    }
     
+    setObjectReturn = (objReturn, value, objParent) => {
+        
+        console.log("a calsse recebeu", objReturn);
+
+        if (value === "instrument") {
+            let object = objParent;
+
+            if (object.instruments === null) object.instruments = [];
+            
+            let found = false;
+
+            object.instruments.filter( instrument => {
+                return instrument.id === objReturn.id
+            }).map( instrument => {
+                found = true;
+                instrument = objReturn
+            });
+
+            if (!found) {
+                object.instruments.push(objReturn);
+            }
+
+            this.setState({ object });
+        }
+    }
+
     handleChangeDescription = (text) => {
         let object = this.state.object;
         object.description = text;
@@ -104,10 +134,30 @@ class InsertControlModuleScreen extends InsertObjectScreen {
         this.setState( { object } );
     };
 
-    handleChangeLogin = (text) => {
+    handleChangePassword = (text) => {
         let object = this.state.object;
         object.password = text;
         this.setState( { object } );
+    };
+
+    handleClickInstrumentItem = (instrument) => {
+        let objectBack = {
+            objEdit: instrument,
+            objParent: this.state.object,
+            value: "instrument"
+        };
+        
+        this.props.navigation.navigate(constNavigation.insertInstrumentScreen.route, { object: objectBack });
+    };
+
+    handleClickAddInstrument = () => {
+        let objectBack = {
+            objEdit: null,
+            objParent: this.state.object,
+            value: "instrument"
+        };
+        
+        this.props.navigation.navigate(constNavigation.insertInstrumentScreen.route, { object: objectBack });        
     };
 
     renderBody = () => {
@@ -137,8 +187,8 @@ class InsertControlModuleScreen extends InsertObjectScreen {
                     Senha
                 </Text>
                 <TextInput 
-                    value={this.state.object.login}
-                    onChangeText={this.handleChangeLogin}
+                    value={this.state.object.password}
+                    onChangeText={this.handleChangePassword}
                     style={styles.input}
                     editable={this.state.crudMode === crudMode.edit}
                     placeholder={"Insira aqui a senha"} />
@@ -155,6 +205,21 @@ class InsertControlModuleScreen extends InsertObjectScreen {
                         textAddButton={ "ADD local" } />
                 </View>
 
+                <Text style={styles.inputLabel}>
+                    Instrumentos
+                </Text>
+                {/* <View style={[styles.dropdown, { marginBottom: 20 }]}> */}
+                <View style={styles.dropdown}>
+                    <DropdownSelectItemsScreen
+                        items={this.state.object.instruments}
+                        dropdownTitle={"Nenhum local selecionado"}
+                        modalTitle={"Selecione um local"}
+                        multipleSelection={true}
+                        editable={ this.state.crudMode == crudMode.edit }
+                        textAddButton={ "ADD instrumento" }
+                        onPressItem={this.handleClickInstrumentItem}
+                        addButtonOnPress={this.handleClickAddInstrument} />
+                </View>
             </ScrollView>
         );
     };

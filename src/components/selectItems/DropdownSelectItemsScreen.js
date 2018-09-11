@@ -8,12 +8,11 @@ import {
 } from 'react-native';
 import SelectItems, { selectMode } from './SelectItems';
 
-// const defualtBackgroundColor = '#00a4d3';rgba(0, 164, 211, 0.5)
 const defualtBackgroundColor = '#7a7a7a';
 
 const imgArrow = require('../../../imgs/arrow_drop_down.png');
 
-class DropdownSelectItems extends Component {
+class DropdownSelectItemsScreen extends Component {
     constructor(props) {
         super(props);
         
@@ -34,7 +33,7 @@ class DropdownSelectItems extends Component {
 
         this.setState( { 
             items: this.props.items !== undefined && this.props.items !== null ? this.props.items : [],
-            selectedItems: this.props.selectedItems !== undefined && this.props.selectedItems !== null ? this.props.selectedItems : [],
+            selectedItems: this.props.items !== undefined && this.props.items !== null ? this.props.items : [],
             multipleSelection: this.props.multipleSelection,
             backgroundColor: this.props.backgroundColor !== undefined ? this.props.backgroundColor : defualtBackgroundColor,
             modalTitle: this.props.modalTitle,
@@ -131,7 +130,9 @@ class DropdownSelectItems extends Component {
                         cancelOnPress={this.handleCancelClick}
                         okOnPress={this.handleOkClick}
                         textAddButton={this.state.textAddButton}
-                        mode={selectMode.listMode} />
+                        mode={selectMode.screenMode}
+                        onPressItem={this.props.onPressItem}
+                        addButtonOnPress={this.props.addButtonOnPress} />
                 </View>
             </TouchableOpacity>
         );
@@ -162,4 +163,4 @@ const styles = StyleSheet.create({
         color: 'white'
     }
 });
-export default DropdownSelectItems;
+export default DropdownSelectItemsScreen;

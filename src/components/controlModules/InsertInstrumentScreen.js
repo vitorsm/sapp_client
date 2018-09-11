@@ -3,10 +3,14 @@ import {
     Text,
     InputText,
     ScrollView,
-    View
+    View,
+    TextInput,
+    Switch
 } from 'react-native';
-import InsertObjectScreen, { crudMode } from '../crud/InsertObjectScreen';
+import InsertObjectScreen, { crudMode, styles } from '../crud/InsertObjectScreen';
 import Constants, { constNavigation } from '../../Constants';
+import DropdownSelectItems from '../selectItems/DropdownSelectItems';
+import ConditionDialog from './ConditionDialog';
 
 class InsertInstrumentScreen extends InsertObjectScreen {
     constructor(props) {
@@ -17,7 +21,8 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             backupObject: null,
             description: " do instrumento",
             title: "Cadastro de instrumento",
-            isKeyboardHide: true
+            isKeyboardHide: true,
+            objectBack: null
         };
     }
 
@@ -35,13 +40,13 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         } else {
             instrument = {
                 id: 0,
-                number: 0,
+                number: null,
                 name: null,
                 description: null,
                 historySampleTime: null,
                 isPowered: true,
                 pinType: null,
-                setPoint: 0.0
+                setPoint: null
             };
         }
         
@@ -64,7 +69,7 @@ class InsertInstrumentScreen extends InsertObjectScreen {
     };
 
     restoreBackupObject = () => {
-        let backupObject = {
+        let object = {
             id: this.state.backupObject.id,
             number: this.state.backupObject.number,
             name: this.state.backupObject.name,
@@ -75,22 +80,112 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             setPoint: this.state.backupObject.setPoint
         };
 
-        this.setState({ backupObject });
+        this.setState({ object });
     };
 
     getDefaultScreenBack = () => {
         return constNavigation.insertControlModule.route;
     };
-
-    getObjectScreenBack = () => {
-        return null;
-    };
-
+    
     // TO DO
     //();
     //handle changes
-    //renderBody ( dentro de um ScrollView )
-    //super.componentDidMount
+    // ( dentro de um ScrollView )
+
+    handleChangeNumber = (text) => {
+        let object = this.state.object;
+        object.number = text;
+        object.id = text;
+        this.setState({ object });
+    };
+
+    handleChangeDescription = (text) => {
+        let object = this.state.object;
+        object.description = text;
+        this.setState({ object });
+    };
+
+    handleChangeIsPowered = (text) => {
+        let object = this.state.object;
+        object.isPowered = text;
+        this.setState({ object });
+
+        console.log(object, this.state.backupObject);
+    };
+    
+    renderBody = () => {
+        return(
+            <ScrollView>
+                <Text style={styles.inputLabel}>
+                    Número da porta
+                </Text>
+                <TextInput 
+                    keyboardType={"numeric"}
+                    value={this.state.object.number}
+                    onChangeText={this.handleChangeNumber}
+                    style={styles.input}
+                    editable={this.state.crudMode === crudMode.edit}
+                    placeholder={"Número da porta do módulo referente ao instrumento"} />
+
+                <Text style={styles.inputLabel}>
+                    Descrição
+                </Text>
+                <TextInput 
+                    value={this.state.object.description}
+                    onChangeText={this.handleChangeDescription}
+                    style={styles.input}
+                    editable={this.state.crudMode === crudMode.edit}
+                    placeholder={"Insira uma descrição para o instrumento"} />
+
+                <Text style={styles.inputLabel}>
+                    Tempo de amostragem (ms)
+                </Text>
+                <TextInput 
+                    keyboardType={"numeric"}
+                    value={this.state.object.historySampleTime}
+                    onChangeText={this.handleChangeHistorySampleTime}
+                    style={styles.input}
+                    editable={this.state.crudMode === crudMode.edit}
+                    placeholder={"Informe um tempo de amostragem para o histórico"} />
+
+                <View style={{ flexDirection: 'row', alignSelf: 'stretch' }}>
+                    <Text style={styles.inputLabel}>
+                        Ligado
+                    </Text>
+                    <Switch 
+                        value={this.state.object.isPowered}
+                        onValueChange={this.handleChangeIsPowered}
+                        disabled={this.state.crudMode !== crudMode.edit}
+                        style={{ flex: 1, alignSelf: 'flex-end', marginRight: 20 }} />
+                </View>
+
+                <Text style={styles.inputLabel}>
+                    Tipo de instrumento
+                </Text>
+                <View style={styles.dropdown}>
+                    <DropdownSelectItems
+                        dropdownTitle={"Nenhum tipo selecionado"}
+                        modalTitle={"Selecione um tipo"}
+                        multipleSelection={false}
+                        editable={ this.state.crudMode == crudMode.edit } />
+                </View>
+
+                <Text style={styles.inputLabel}>
+                    Setpoint
+                </Text>
+                <TextInput 
+                    keyboardType={"numeric"}
+                    value={this.state.object.historySampleTime}
+                    onChangeText={this.handleChangeHistorySampleTime}
+                    style={styles.input}
+                    editable={this.state.crudMode === crudMode.edit}
+                    placeholder={"Informe um valor de setpoint"} />
+
+                <ConditionDialog />
+
+            </ScrollView>
+        );
+    };
 }
 
 export default InsertInstrumentScreen;

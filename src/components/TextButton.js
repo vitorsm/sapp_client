@@ -48,7 +48,7 @@ class TextButton extends Component {
 
 const styles = StyleSheet.create({
     touchButton: {
-        margin: 20,
+        // margin: 20,
         padding: 20,
         borderRadius: 5,
         alignItems: 'center'

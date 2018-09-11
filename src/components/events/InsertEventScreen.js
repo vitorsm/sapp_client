@@ -35,7 +35,8 @@ class InsertEventScreen extends InsertObjectScreen {
             description: "do evento",
             title: "Cadastro de evento",
             isKeyboardHide: true,
-            value: 0
+            value: 0,
+            objectBack: null
         };
     }
 
@@ -97,10 +98,10 @@ class InsertEventScreen extends InsertObjectScreen {
     getDefaultScreenBack = () => {
         return constNavigation.events.route;
     };
-
-    getObjectScreenBack = () => {
-        return null;
-    };
+    
+    setObjectScreenBack = (objectBack) => {
+        this.setState({ objectBack });
+    }
     
     handleChangeActive = (value) => {
         let object = this.state.object;

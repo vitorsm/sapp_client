@@ -30,7 +30,7 @@ class ObjectScreen extends Component {
     //         style={{ height: 24, width: 24}} />
     //     ),
     //     title: "Usuários"
-    //   };
+    //};
 
 
     filterObject = (text) => {
@@ -50,7 +50,12 @@ class ObjectScreen extends Component {
     };
 
     navigateToInsertScreen = (object) => {
-        this.props.navigation.navigate(this.state.routeInsertScreen, { object: object});
+      // { objParent, objEdit, objReturn, value }
+      let objectSend = {
+        objParent: object
+      };
+
+        this.props.navigation.navigate(this.state.routeInsertScreen, { object: objectSend });
     }
 
     renderListItems = () => {

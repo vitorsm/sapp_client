@@ -23,7 +23,8 @@ class DoorLockInsertScreen extends InsertObjectScreen {
             backupObject: null,
             description: " da porta",
             title: "Cadastrar porta",
-            isKeyboardHide: true
+            isKeyboardHide: true,
+            objectBack: null
         };
     }
 
@@ -86,10 +87,10 @@ class DoorLockInsertScreen extends InsertObjectScreen {
         return constNavigation.doorLocks.route;
     };
 
-    getObjectScreenBack = () => {
-        return null;
-    };
-
+    setObjectScreenBack = (objectBack) => {
+        this.setState({ objectBack });
+    }
+    
     handleChangeDescription = (text) => {
         let object = this.state.object;
         object.description = text;

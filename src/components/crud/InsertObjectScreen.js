@@ -14,7 +14,8 @@ import Constants, {
     colors,
     saveImg,
     cancelImg,
-    editImg
+    editImg,
+    deleteImg
 } from '../../Constants';
 
 export const crudMode = {
@@ -41,16 +42,58 @@ class InsertObjectScreen extends Component {
     //this.state.isKeyboardHide
     //super.componentDidMount
     //super.componentWillMount
-    //getObjectScreenBack() { object: {}, edit: true }
+    //setObjectScreenBack(){ objParent, objEdit, objReturn, value, isEditing }
+    //if objEdit !== null then setObject(objEdit) else setObject(objParent)
+    //setObjectReturn();{ objParent, objEdit, objReturn, value, isEditing } pega o objReturn e trabalha 
+    //o value é pra saber oq ta sendo retornado
     
     componentWillMount() {
-
       if (this.props.crudMode != undefined) {
         this.setState( { crudMode: this.props.crudMode } );
       }
-      let object = this.props.navigation.getParam('object', null);
-      
-      this.setObject(object);
+
+      // let object = this.props.navigation.getParam('object', null);
+      // this.setObject(object);
+
+      let objectBack = this.props.navigation.getParam('object', null);
+      // this.setObjectScreenBack(objectBack);
+
+      if (objectBack !== null) {
+        let setCrudModeEditing = false;
+
+        if (objectBack.objReturn !== undefined) {
+          if (this.setObjectReturn !== undefined) {
+            this.setObjectReturn(objectBack.objReturn, objectBack.value, objectBack.objParent);
+          }
+          setCrudModeEditing = true;
+          // verificando se tem objectEdit, se tiver é ele q tem q setar
+        } else if (objectBack.objEdit !== undefined) {
+          this.setObject(objectBack.objEdit);
+        } else {
+          this.setObject(objectBack.objParent);
+        }
+        if (setCrudModeEditing || objectBack.isEditing) {
+          this.setState({ crudMode: crudMode.edit });
+        }
+      } else {
+        // o setObject cria uma instancia no caso de o objeto ser nulo
+        // o objeto pode ser nulo se for inserir ao inves de editar objeto
+        this.setObject(null);
+      }
+
+      // if (objectBack !== null) {
+      //   if (objectBack.edit) {
+      //     if (this.setObjectReturn === undefined) {
+      //       this.setObject(objectBack.objectReturn);
+      //     } else {
+      //       this.setObjectReturn(objectBack);
+      //     }
+      //   } else {
+      //     this.setObject(objectBack.objectEditing);
+      //   }
+      // }
+
+      this.setState( { objectBack: objectBack } );
     }
 
     componentDidMount() {
@@ -63,7 +106,6 @@ class InsertObjectScreen extends Component {
       this.keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => this.setState( { isKeyboardHide: false } ));
       this.keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => this.setState( { isKeyboardHide: true } ));
     }
-    
 
     getScreenBack = () => {
         let navScreenBack = this.props.navigation.getParam('screenBack', null);
@@ -90,6 +132,16 @@ class InsertObjectScreen extends Component {
     handleClickCancelButton = () => {
         this.restoreBackupObject();
         this.setState( { crudMode: crudMode.view, showBackButton: true } );
+    }
+
+    handleClickDeleteButton = () => {
+      
+    };
+
+    handlePressBack = () => {
+      if (this.state.crudMode === crudMode.edit) {
+        this.restoreBackupObject();
+      }
     }
 
     renderNameHeader = () => {
@@ -145,10 +197,15 @@ class InsertObjectScreen extends Component {
     
             <TouchableOpacity 
               style={styles.actionsButton}
+              onPress={this.handleClickDeleteButton}>
+              <Image source={deleteImg} style={styles.imgButtons}/>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={styles.actionsButton}
               onPress={this.handleClickEditButton}>
               <Image source={editImg} style={styles.imgButtons}/>
             </TouchableOpacity>
-    
           </View>
         );
     };
@@ -214,7 +271,9 @@ class InsertObjectScreen extends Component {
               buttonView={buttonView.backWithoutFilter}
               screenBack={this.getScreenBack()}
               showButton={true}
-              objectScreenBack={this.getObjectScreenBack()} />
+              objectScreenBack={this.state.objectBack}
+              objectBackupReturn={this.state.backupObject}
+              onPressBack={this.handlePressBack} />
     
             <View style={styles.container} >
               { this.renderInputs() }
@@ -259,7 +318,8 @@ export const styles = StyleSheet.create({
   },
   body: {
     flex: 5,
-    alignSelf: 'stretch'
+    alignSelf: 'stretch',
+    marginBottom: 20
   },
   inputLabel: {
     marginLeft: 20,
@@ -269,7 +329,10 @@ export const styles = StyleSheet.create({
   },
   input: {
     marginLeft: 20,
-    marginRight: 40
+    marginRight: 40,
+  },
+  inputNumber: {
+    width: "20%"
   },
   actions: {
     flexDirection: 'row',

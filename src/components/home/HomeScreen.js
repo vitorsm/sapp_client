@@ -16,7 +16,6 @@ import { constNavigation } from '../../Constants';
 const img = require('../../../imgs/home.png');
 const appName = "SAPP Client";
 
-var fScroll = null;
 
 const imgNetwork = require('../../../imgs/module_network.png');
 

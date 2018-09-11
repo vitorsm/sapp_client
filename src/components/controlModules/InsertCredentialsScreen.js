@@ -115,7 +115,7 @@ class InsertCredentialsScreen extends Component {
 
     renderActions = () => {
         return(
-            <View>
+            <View style={styles.buttonView}>
                 <TextButton 
                     text={"Enviar credenciais"}
                     onPress={this.handleSendCredentials}/>
@@ -183,6 +183,11 @@ const styles = StyleSheet.create({
     },
     input: {
         marginBottom: 10
+    },
+    buttonView: {
+        margin: 40,
+        marginTop: 10,
+        marginBottom: 20
     }
 });
 export default InsertCredentialsScreen;

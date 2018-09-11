@@ -8,6 +8,7 @@ import {
   Button,
   TouchableOpacity
 } from 'react-native';
+import ButtonText from '../TextButton';
 
 const logoIcon = require('../../../imgs/logo.png');
 
@@ -57,10 +58,13 @@ class LoginScreen extends Component {
 
             <View style={styles.buttonView}>
 
-                <Button 
+                {/* <Button 
                     onPress={this.handleLoginButton}
                     title={"Entrar"}
-                    style={styles.buttonLogin}/>
+                    style={styles.buttonLogin}/> */}
+
+                <ButtonText onPress={this.handleLoginButton}
+                    text={"Entrar"} />
                 
                 <TouchableOpacity onPress={this.handleForgotPasswordButton}>
                     <Text style={styles.textForgotPassword}>
