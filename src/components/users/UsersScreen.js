@@ -6,6 +6,8 @@ import {
 } from 'react-native';
 import ObjectScreen from '../crud/ObjectScreen';
 import Constants, { constNavigation } from '../../Constants';
+import { connect } from 'react-redux';
+import * as actions from "../../actions";
 
 const img = require('../../../imgs/users.png');
 
@@ -17,63 +19,32 @@ class UsersScreen extends ObjectScreen {
             objects: [],
             objectsFilter: [],
             routeInsertScreen: constNavigation.insertUser.route,
-            title: "Usuários"
+            title: "Usuários",
+            showProgress: false
         };
     }
 
     componentWillMount() {
-        let users = [
-          {
-            id: 15,
-            name: "Vítor de Sousa Moreira",
-            login: "vitorsm",
-            password: null
-          },{
-            id: 16,
-            name: "Geraldo Cristino Moreira",
-            login: "geraldocm",
-            password: null
-          },{
-            id: 17,
-            name: "Erica Silva Sousa",
-            login: "ericass",
-            password: null
-          },
-          {
-            id: 18,
-            name: "Vítor de Sousa Moreira",
-            login: "vitorsm",
-            password: null
-          },{
-            id: 19,
-            name: "Geraldo Cristino Moreira",
-            login: "geraldocm",
-            password: null
-          },{
-            id: 20,
-            name: "Erica Silva Sousa",
-            login: "ericass",
-            password: null
-          },
-          {
-            id: 21,
-            name: "Vítor de Sousa Moreira",
-            login: "vitorsm",
-            password: null
-          },{
-            id: 22,
-            name: "Geraldo Cristino Moreira",
-            login: "geraldocm",
-            password: null
-          },{
-            id: 23,
-            name: "Erica Silva Sousa",
-            login: "ericass",
-            password: null
-          }
-        ];
-    
-        this.setState( { objects: users, objectsFilter: users } );
+
+        this.props.fetchUsers();
+        this.setState({ showProgress: true });
+    }
+
+    componentWillReceiveProps(nextProps) {
+
+      if (nextProps.users !== this.props.users) {
+        if (nextProps.users.error !== undefined) {
+          this.setState({ showProgress: false });
+          alert("Erro http: " + nextProps.users.error);
+        } else {
+          this.setState({ 
+            objects: nextProps.users,
+            objectsFilter: nextProps.users,
+            showProgress: false
+          });
+        }
+      }
+
     }
 
     static navigationOptions = {
@@ -86,4 +57,10 @@ class UsersScreen extends ObjectScreen {
     };
 }
 
-export default UsersScreen;
+// export default UsersScreen;
+
+function mapStateToProps({ users }) {
+  return { users };
+}
+
+export default connect(mapStateToProps, actions)(UsersScreen);

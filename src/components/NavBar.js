@@ -75,7 +75,7 @@ class NavBar extends Component {
     if (this.state.buttonView == buttonView.backWithoutFilter ||
       this.state.buttonView == buttonView.back) {
       
-      console.log("obj q vai: ", this.props.objectBackupReturn);
+      
 
       if (this.props.onPressBack !== undefined)
         this.props.onPressBack();
@@ -85,7 +85,7 @@ class NavBar extends Component {
         // { objParent, objEdit, objReturn, value, isEditing } pega o objReturn e trabalha 
         objectScreenBack.objEdit = undefined;
         objectScreenBack.objReturn = this.props.objectBackupReturn;
-        console.log("obj q vai real: ", objectScreenBack);
+        
         this.props.navigation.navigate(this.props.screenBack, { object: objectScreenBack } );
       } else {
         this.props.navigation.navigate(this.props.screenBack);

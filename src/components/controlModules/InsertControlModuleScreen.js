@@ -98,8 +98,6 @@ class InsertControlModuleScreen extends InsertObjectScreen {
     
     setObjectReturn = (objReturn, value, objParent) => {
         
-        console.log("a calsse recebeu", objReturn);
-
         if (value === "instrument") {
             let object = objParent;
 
@@ -220,6 +218,7 @@ class InsertControlModuleScreen extends InsertObjectScreen {
                         onPressItem={this.handleClickInstrumentItem}
                         addButtonOnPress={this.handleClickAddInstrument} />
                 </View>
+
             </ScrollView>
         );
     };

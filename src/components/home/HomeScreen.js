@@ -13,6 +13,7 @@ import HomeButton from './HomeButton';
 import { constNavigation } from '../../Constants';
 
 
+
 const img = require('../../../imgs/home.png');
 const appName = "SAPP Client";
 
@@ -22,7 +23,7 @@ const imgNetwork = require('../../../imgs/module_network.png');
 class HomeScreen extends Component {
     constructor(props) {
         super(props);
-
+        
         this.state = {
             title: "",
             loggedUser: {
@@ -32,7 +33,11 @@ class HomeScreen extends Component {
     }
 
     componentWillMount() {
-        // this.setState( { fScroll: this._panResponder.fScroll } );
+
+        // console.log("parametros", this.props.navigation.getParam('params', null));
+        // console.log("props home", this.props);
+        // this.props.navigation.test = "teste";
+        // console.log("props home", this.props);
 
         this._panResponder = PanResponder.create({
 
@@ -50,9 +55,6 @@ class HomeScreen extends Component {
             },
             fScroll: this.fScroll
         });
-    }
-
-    componentDidMount() {
     }
 
     static navigationOptions = {

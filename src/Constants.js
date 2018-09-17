@@ -21,38 +21,65 @@ const navigationOptionsHide = ({ navigation }) => ({
     drawerLabel: () => null
 });
 
+
+const homeImg = require('../imgs/home.png');
+const controlModulesImg = require('../imgs/control_modules.png');
+const eventsImg = require('../imgs/events.png');
+const usersImg = require('../imgs/users.png');
+const rfIdCardsImg = require('../imgs/card.png');
+const doorLocksImg = require('../imgs/door_locks.png');
+const placesImg = require('../imgs/places.png');
+const aboutImg = require('../imgs/about.png');
+
+
 export const constNavigation = {
     home: {
         route: 'home',
-        screen: HomeScreen
+        screen: HomeScreen,
+        title: 'Home',
+        img: usersImg
     },
     controlModules: {
         route: 'controlModules',
-        screen: ControlModulesScreen
+        screen: ControlModulesScreen,
+        title: 'Módulos de controle',
+        img: controlModulesImg
     },
     events: {
         route: 'events',
-        screen: EventsScreen
+        screen: EventsScreen,
+        title: 'Eventos',
+        img: eventsImg
     },
     users: {
         route: 'users',
-        screen: UsersScreen
+        screen: UsersScreen,
+        title: 'Usuários',
+        img: usersImg
     },
     rfIdCards: {
         route: 'rfIdCards',
-        screen: RfIdCardsScreen
+        screen: RfIdCardsScreen,
+        title: 'Cartões RF-ID',
+        img: rfIdCardsImg
     },
     doorLocks: {
         route: 'doorLocks',
         screen: DoorLockScreen,
+        title: 'Portas',
+        img: doorLocksImg
     },
     places: {
         route: 'places',
-        screen: PlacesScreen
+        screen: PlacesScreen,
+        title: 'Locais',
+        img: placesImg
     },
     about: {
         route: 'about',
-        screen: AboutScreen
+        screen: AboutScreen,
+        title: 'Sobre',
+        img: aboutImg
     },
     insertUser: {
         route: 'insertUser',

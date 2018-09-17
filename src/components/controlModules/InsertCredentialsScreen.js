@@ -12,6 +12,9 @@ import Constants, {
     constNavigation,
 } from '../../Constants';
 import TextButton from '../TextButton';
+import { connect } from 'react-redux';
+import * as actions from "../../actions";
+
 
 
 class InsertCredentialsScreen extends Component {
@@ -27,7 +30,56 @@ class InsertCredentialsScreen extends Component {
         };
     }
 
+
+    sendCredentials = (data) => {
+        let dgram = require('dgram');
+        let socket = dgram.createSocket('udp4');
+        let port = 4421;
+        let address = "192.168.43.238";
+    
+        socket.bind(4162);
+    
+        var buf = this.toUTF8Array('excellent!')
+        socket.send(buf, 0, buf.length, port, address, function(err) {
+            //if (err) throw err
+            console.log(err);
+        });
+    }
+    
+    toUTF8Array = (str) => {
+        var utf8 = [];
+        for (var i=0; i < str.length; i++) {
+            var charcode = str.charCodeAt(i);
+            if (charcode < 0x80) utf8.push(charcode);
+            else if (charcode < 0x800) {
+                utf8.push(0xc0 | (charcode >> 6), 
+                          0x80 | (charcode & 0x3f));
+            }
+            else if (charcode < 0xd800 || charcode >= 0xe000) {
+                utf8.push(0xe0 | (charcode >> 12), 
+                          0x80 | ((charcode>>6) & 0x3f), 
+                          0x80 | (charcode & 0x3f));
+            }
+            // surrogate pair
+            else {
+                i++;
+                // UTF-16 encodes 0x10000-0x10FFFF by
+                // subtracting 0x10000 and splitting the
+                // 20 bits of 0x0-0xFFFFF into two halves
+                charcode = 0x10000 + (((charcode & 0x3ff)<<10)
+                          | (str.charCodeAt(i) & 0x3ff));
+                utf8.push(0xf0 | (charcode >>18), 
+                          0x80 | ((charcode>>12) & 0x3f), 
+                          0x80 | ((charcode>>6) & 0x3f), 
+                          0x80 | (charcode & 0x3f));
+            }
+        }
+        return utf8;
+    }
+
     handleSendCredentials = () => {
+        // this.props.sendCredentials();
+        this.sendCredentials();
 
         alert("Vai enviar as credenciais: ssid: " + 
             this.state.ssid + 
@@ -190,4 +242,10 @@ const styles = StyleSheet.create({
         marginBottom: 20
     }
 });
-export default InsertCredentialsScreen;
+// export default InsertCredentialsScreen;
+
+function mapStateToProps({ accountLogin }) {
+    return { accountLogin };
+}
+
+export default connect(mapStateToProps, actions)(InsertCredentialsScreen);

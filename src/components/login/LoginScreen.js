@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
+import * as actions from "../../actions";
 import {
   StyleSheet,
   Text,
@@ -6,7 +8,8 @@ import {
   TextInput,
   Image,
   Button,
-  TouchableOpacity
+  TouchableOpacity,
+  ActivityIndicator
 } from 'react-native';
 import ButtonText from '../TextButton';
 
@@ -18,20 +21,80 @@ class LoginScreen extends Component {
 
         this.state = {
             loginText: null,
-            passwordText: null
+            passwordText: null,
+            accountLogin: null,
+            showProgress: false,
+            openLoginFail: false
         };
     }
 
+    componentWillReceiveProps(nextProps) {
+
+        if (nextProps.accountLogin !== this.props.accountLogin) {
+            this.setState({ showProgress: false });
+
+            if (nextProps.accountLogin.error === undefined) {
+                this.setState({ accountLogin: nextProps.accountLogin });
+            } else if (nextProps.accountLogin.error === 401) {
+                // this.setState({ openLoginFail: true });
+                alert("Login e/ou senha incorretos")
+            } else if (nextProps.accountLogin.error === 403) {
+                alert("Sem permissão ou acesso")
+            } else {
+                alert("Falha de conexão");
+            }
+
+        }
+
+    }
+
     handleLoginButton = () => {
-        alert("logou com " + this.state.loginText + " | " + this.state.passwordText);
-        this.props.setToken("TESTE");
+        this.setState({ showProgress: true });
+
+        this.props.fetchAccountLogin({
+            login: this.state.loginText,
+            password: this.state.passwordText
+        });
+
     };
 
     handleForgotPasswordButton = () => {
         alert("clicou no bt esqueci minha senha");
     };
 
+    renderProgress = () => { 
+        return(
+            <Text>
+                Carregando...
+            </Text>
+        );
+    };
+
+    renderActions = () => {
+        if (this.state.showProgress) {
+            return(
+                <ActivityIndicator size="large" />
+            );
+        }
+
+        return(
+            <View style={styles.buttonView}>
+
+                <ButtonText onPress={this.handleLoginButton}
+                    text={"Entrar"} />
+                
+                <TouchableOpacity onPress={this.handleForgotPasswordButton}>
+                    <Text style={styles.textForgotPassword}>
+                        Esqueci minha senha
+                    </Text>
+                </TouchableOpacity>
+            </View>
+        );
+
+    };
+
     render() {
+
         return (
         <View style={styles.login}>
             
@@ -56,22 +119,7 @@ class LoginScreen extends Component {
 
             </View>
 
-            <View style={styles.buttonView}>
-
-                {/* <Button 
-                    onPress={this.handleLoginButton}
-                    title={"Entrar"}
-                    style={styles.buttonLogin}/> */}
-
-                <ButtonText onPress={this.handleLoginButton}
-                    text={"Entrar"} />
-                
-                <TouchableOpacity onPress={this.handleForgotPasswordButton}>
-                    <Text style={styles.textForgotPassword}>
-                        Esqueci minha senha
-                    </Text>
-                </TouchableOpacity>
-            </View>
+            { this.renderActions() }
 
         </View>
         );
@@ -88,7 +136,7 @@ const styles = StyleSheet.create({
 
     },
     inputView: {
-        margin: 10,
+        margin: 20,
         paddingLeft: 20,
         paddingRight: 20,
         alignItems: 'stretch',
@@ -96,7 +144,7 @@ const styles = StyleSheet.create({
     },
     loginInput: {
         marginBottom: 5,
-        marginBottom: 10,
+        marginBottom: 15,
         fontSize: 16
     },
     passwordInput: {
@@ -121,4 +169,8 @@ const styles = StyleSheet.create({
     }
 });
 
-export default LoginScreen;
+function mapStateToProps({ accountLogin }) {
+    return { accountLogin };
+}
+
+export default connect(mapStateToProps, actions)(LoginScreen);

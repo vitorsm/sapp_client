@@ -6,7 +6,9 @@ import {
     TouchableOpacity,
     Image,
     TextInput,
-    Keyboard
+    Keyboard,
+    Alert,
+    ActivityIndicator
 } from 'react-native';
 import NavBar, { buttonView } from '../NavBar';
 import Constants, { 
@@ -46,6 +48,8 @@ class InsertObjectScreen extends Component {
     //if objEdit !== null then setObject(objEdit) else setObject(objParent)
     //setObjectReturn();{ objParent, objEdit, objReturn, value, isEditing } pega o objReturn e trabalha 
     //o value é pra saber oq ta sendo retornado
+    //this.state.sendObject => this.props.sendAlgumaCoisa
+    //getDeleteMessage()
     
     componentWillMount() {
       if (this.props.crudMode != undefined) {
@@ -120,23 +124,36 @@ class InsertObjectScreen extends Component {
         this.setState( { object } );
     };
 
-    handleClickEditButton = () => {
-        this.setState({ crudMode: crudMode.edit, showBackButton: false });
+    handleClickSaveButton = () => {
+      this.state.sendObject(this.state.object);
+      this.setState( { crudMode: crudMode.view, showBackButton: true } );
+    }
+  
+    handleClickDeleteButton = () => {
+
+      Alert.alert(
+        'Deletar',
+        this.getDeleteMessage(),
+        [
+          {text: 'Não', onPress: () => { }, style: 'cancel'},
+          {text: 'Sim', onPress: () => {
+            this.props.deleteUser(this.state.object);
+            this.props.navigation.navigate(this.getDefaultScreenBack());
+          }},
+        ],
+        { cancelable: false }
+      );
+
     }
 
-    handleClickSaveButton = () => {
-        this.setObject(this.state.object);
-        this.setState( { crudMode: crudMode.view, showBackButton: true } );
+    handleClickEditButton = () => {
+        this.setState({ crudMode: crudMode.edit, showBackButton: false });
     }
 
     handleClickCancelButton = () => {
         this.restoreBackupObject();
         this.setState( { crudMode: crudMode.view, showBackButton: true } );
     }
-
-    handleClickDeleteButton = () => {
-      
-    };
 
     handlePressBack = () => {
       if (this.state.crudMode === crudMode.edit) {
@@ -241,6 +258,11 @@ class InsertObjectScreen extends Component {
     };
 
     _renderBody = () => {
+        if (this.state.showProgress) {
+          return(
+            <ActivityIndicator size="large" />
+          );
+        }
 
         return(
           <View style={styles.body}>
@@ -332,7 +354,9 @@ export const styles = StyleSheet.create({
     marginRight: 40,
   },
   inputNumber: {
-    width: "20%"
+    width: "20%",
+    marginLeft: 20,
+    marginRight: 40
   },
   actions: {
     flexDirection: 'row',

@@ -5,12 +5,31 @@ import {
     ScrollView,
     View,
     TextInput,
-    Switch
+    Switch,
+    StyleSheet
 } from 'react-native';
 import InsertObjectScreen, { crudMode, styles } from '../crud/InsertObjectScreen';
 import Constants, { constNavigation } from '../../Constants';
 import DropdownSelectItems from '../selectItems/DropdownSelectItems';
-import ConditionDialog from './ConditionDialog';
+// import ConditionDialog from './ConditionDialog';
+import ConditionItem from '../condition/ConditionItem';
+import SeparatorGroupCrud from '../SeparatorGroupCrud';
+import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
+import TextButton from '../TextButton';
+
+const groupTypes = [
+    { 
+        value: 0,
+        label: "e        ",
+        id: 'E'
+    },
+    {
+        value: 1,
+        label: "ou",
+        id: 'O'
+    }
+];
+
 
 class InsertInstrumentScreen extends InsertObjectScreen {
     constructor(props) {
@@ -46,7 +65,9 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                 historySampleTime: null,
                 isPowered: true,
                 pinType: null,
-                setPoint: null
+                setPoint: null,
+                pidControl: null,
+                powerConditions: null
             };
         }
         
@@ -58,7 +79,9 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             historySampleTime: instrument.historySampleTime,
             isPowered: instrument.isPowered,
             pinType: instrument.pinType,
-            setPoint: instrument.setPoint
+            setPoint: instrument.setPoint,
+            pidControl: instrument.pidControl,
+            powerConditions: instrument.powerConditions
         };
 
         if (isNull) {
@@ -77,7 +100,9 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             historySampleTime: this.state.backupObject.historySampleTime,
             isPowered: this.state.backupObject.isPowered,
             pinType: this.state.backupObject.pinType,
-            setPoint: this.state.backupObject.setPoint
+            setPoint: this.state.backupObject.setPoint,
+            pidControl: this.state.backupObject.pidControl,
+            powerConditions: this.state.backupObject.powerConditions
         };
 
         this.setState({ object });
@@ -109,10 +134,87 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         let object = this.state.object;
         object.isPowered = text;
         this.setState({ object });
+    };
 
-        console.log(object, this.state.backupObject);
+    handleClickAddCondition = () => {
+        let object = this.state.object;
+
+        if (object.powerConditions === null) object.powerConditions = [];
+
+        let condition = {
+            id: null,
+            input: null,
+            value: 0,
+            operationType: null
+        };
+
+        object.powerConditions.push(condition);
+        this.setState({ object });
     };
     
+    handleClickRemoveCondition = (index) => {
+        let object = this.state.object;
+        object.powerConditions.splice(index, 1);
+        this.setState({ object });
+    };
+
+    renderPIDParams = () => {
+        return(
+            <View style={specifStyles.viewPID}>
+                <Text style={styles.inputLabel}>
+                    Kp
+                </Text>
+                <TextInput 
+                    keyboardType={"numeric"}
+                    value={this.state.object.historySampleTime}
+                    onChangeText={this.handleChangeHistorySampleTime}
+                    style={specifStyles.inputNumber}
+                    editable={this.state.crudMode === crudMode.edit} />
+
+                <Text style={styles.inputLabel}>
+                    Ki
+                </Text>
+                <TextInput 
+                    keyboardType={"numeric"}
+                    value={this.state.object.historySampleTime}
+                    onChangeText={this.handleChangeHistorySampleTime}
+                    style={specifStyles.inputNumber}
+                    editable={this.state.crudMode === crudMode.edit} />
+
+                <Text style={styles.inputLabel}>
+                    Kd
+                </Text>
+                <TextInput 
+                    keyboardType={"numeric"}
+                    value={this.state.object.historySampleTime}
+                    onChangeText={this.handleChangeHistorySampleTime}
+                    style={specifStyles.inputNumber}
+                    editable={this.state.crudMode === crudMode.edit} />
+            </View>
+        );
+    };
+
+    renderConditions = () => {
+        let conditions = this.state.object.powerConditions;
+
+        if (conditions === null || conditions.length === 0) {
+            return(
+                <View style={{ alignItems: "center" }}><Text>Nenhuma condição cadastrada.</Text></View>
+            );
+        }
+
+        return conditions.map((condition, i) => {
+            return(
+                <ConditionItem
+                    key={i}
+                    title={"Condição " + (i + 1)}
+                    editable={this.state.crudMode === crudMode.edit}
+                    condition={condition}
+                    onPressRemove={() => this.handleClickRemoveCondition(i)} />
+            );
+        });
+    };
+
     renderBody = () => {
         return(
             <ScrollView>
@@ -177,15 +279,71 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                     keyboardType={"numeric"}
                     value={this.state.object.historySampleTime}
                     onChangeText={this.handleChangeHistorySampleTime}
-                    style={styles.input}
-                    editable={this.state.crudMode === crudMode.edit}
-                    placeholder={"Informe um valor de setpoint"} />
+                    style={styles.inputNumber}
+                    editable={this.state.crudMode === crudMode.edit} />
 
-                <ConditionDialog />
+                <SeparatorGroupCrud isLine={true} text={"Parametros de controle"}/>
 
+                <Text style={styles.inputLabel}>
+                    Parametros PID
+                </Text>
+                { this.renderPIDParams() }
+
+                <Text style={styles.inputLabel}>
+                    Entrada do controle
+                </Text>
+                <View style={styles.dropdown}>
+                    <DropdownSelectItems
+                        dropdownTitle={"Nenhum instrumento selecionado"}
+                        modalTitle={"Selecione um instrumento"}
+                        multipleSelection={false}
+                        editable={ this.state.crudMode == crudMode.edit }
+                        textAddButton={"ADD instrumento"} />
+                </View>
+
+                <SeparatorGroupCrud isLine={true} text={"Condição de energia"}/>
+                
+                <Text style={styles.inputLabel}>
+                    Tipo de agrupamento das condições
+                </Text>
+                <View style={styles.input}>
+                    <RadioForm
+                        radio_props={groupTypes}
+                        initial={groupTypes[0].value}
+                        onPress={(value) => {this.setState({value:value})}}
+                        buttonSize={10}
+                        formHorizontal={true}
+                        animation={false} />    
+                </View>
+
+                <View style={{ marginTop: 20 }}>
+                    { this.renderConditions() }
+                </View>
+
+                <View style={{ alignItems: "center" }}>
+                    <View style={{ marginTop: 20, width: "50%" }}>
+                        <TextButton 
+                            text={"Add condição"}
+                            onPress={this.handleClickAddCondition} />
+                    </View>
+                </View>
+                
             </ScrollView>
+
         );
     };
 }
+
+const specifStyles = StyleSheet.create({
+    viewPID: {
+        flexDirection: 'row'
+    },
+    inputNumber: {
+        width: "20%"
+    },
+    message: {
+
+    }
+});
 
 export default InsertInstrumentScreen;

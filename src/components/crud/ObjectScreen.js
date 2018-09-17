@@ -6,12 +6,15 @@ import {
   Image,
   Button,
   TouchableOpacity,
-  ScrollView
+  ScrollView,
+  ActivityIndicator
 } from 'react-native';
 import NavBar, { buttonView } from '../NavBar';
 import Constants, { constNavigation, addImg, refreshImg } from '../../Constants';
 import ObjectListItem from './ObjectListItem';
 import FloatActionButton from '../FloatActionButton';
+
+const notImg = require('../../../imgs/not.png');
 
 class ObjectScreen extends Component {
 
@@ -19,6 +22,7 @@ class ObjectScreen extends Component {
         super(props);
     }
     // TO DO
+    // this.state.showProgress
     // this.state.objects ( deve ter name e id )
     // this.state.objectsFilter ( copia objects )
     // this.state.routeInsertScreen;
@@ -59,7 +63,14 @@ class ObjectScreen extends Component {
     }
 
     renderListItems = () => {
-        if (this.state.objectsFilter === null || this.state.objectsFilter === undefined) return null;
+        if (this.state.objectsFilter === null || this.state.objectsFilter === undefined || this.state.objectsFilter.length === 0) {
+          return(
+            <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 50 }}>
+              <Image source={notImg}/>
+              <Text style={{ fontSize: 24 }}>Nada encontrado</Text>
+            </View>
+          );
+        }
     
         return this.state.objectsFilter.map( object => {
           return(
@@ -71,6 +82,12 @@ class ObjectScreen extends Component {
     };
 
     renderList = () => {
+        if (this.state.showProgress) {
+          return(
+            <ActivityIndicator size="large" />
+          );
+        }
+        
         return(
           <View style={{ flex: 1 }}>
             <ScrollView style={styles.list}>

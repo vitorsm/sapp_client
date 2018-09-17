@@ -130,14 +130,14 @@ class SelectItems extends Component {
             }
     
             let list = this.state.selectedItems;
-            let index = list.indexOf(item);
-    
+            let index = this.getIndexSelectedItem(item);
+
             if (index >= 0) {
                 list.splice(index, 1);
             } else {
                 list.push(item);
             }
-    
+            
             this.setState( { selectedItems: list });
         } else if (this.state.mode === selectMode.screenMode) {
             this.props.onPressItem(item);
@@ -152,6 +152,31 @@ class SelectItems extends Component {
 
         alert("filtrados: " + itemsFiltered.length);
         this.setState( { itemsFiltered } );
+    };
+
+    containsItemSelected = (item) => {
+        if (this.state.selectedItems === undefined || this.state.selectedItems === null) return false;
+        
+        for (let i = 0; i < this.state.selectedItems.length; i++) {
+            if (this.state.selectedItems[i].id === item.id) {
+                return true;
+            }
+        }
+
+        return false;
+    };
+
+    getIndexSelectedItem = (item) => {
+        if (this.state.selectedItems === undefined || this.state.selectedItems === null) return -1;
+
+        
+        for (let i = 0; i < this.state.selectedItems.length; i++) {
+            if (this.state.selectedItems[i].id === item.id) {
+                return i;
+            }
+        }
+
+        return -1;
     };
 
     renderSelectAll = () => {
@@ -209,7 +234,8 @@ class SelectItems extends Component {
             return (
                 <ItemList
                     key={i}
-                    selected={this.state.selectedItems.includes(item)}
+                    // selected={this.state.selectedItems.includes(item)}
+                    selected={this.containsItemSelected(item)}
                     item={item}
                     onPress={() => { this.handleClickItem(item); }} />
             );

@@ -1,24 +1,18 @@
 import React, { Component } from 'react';
 import {
-  StyleSheet,
   Text,
   View,
   Image,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  Button,
-  Keyboard
+  ScrollView
 } from 'react-native';
 import NavBar, { buttonView } from '../NavBar';
-import Constants, { 
-  constNavigation,
-  colors,
-  saveImg,
-  cancelImg,
-  editImg
-} from '../../Constants';
+import Constants, { constNavigation } from '../../Constants';
 import InsertObjectScreen, { crudMode, styles } from '../crud/InsertObjectScreen';
+import { connect } from 'react-redux';
+import * as actions from "../../actions";
+import DropdownSelectItems from '../selectItems/DropdownSelectItems';
 
 class InsertUserScreen extends InsertObjectScreen {
 
@@ -31,40 +25,63 @@ class InsertUserScreen extends InsertObjectScreen {
       crudMode: crudMode.view,
       isKeyboardHide: true,
       showBackButton: true,
-      objectBack: null
+      objectBack: null,
+      showProgress: false,
+      description: "do usuário",
+      title: "Usuário",
+      permissions: [],
+      showProgress: false
     };
 
+  }
+
+  componentWillMount() {
+    super.componentWillMount();
+    this.props.fetchPermissions();
+    this.setState({ sendObject: this.props.sendUser, showProgress: true });
   }
 
   componentWillReceiveProps(nextProps) {
 
     if (this.props.crudMode !== nextProps.crudMode) {
       this.setState( { crudMode: nextProps.crudMode } );
-    } else if (this.props.user !== nextProps.user) {
-      this.setObject(nextProps.user);
+    } else if (this.props.users !== nextProps.users) {
+      if (nextProps.users.error !== undefined) {
+        this.setState({ showProgress: false });
+        alert("Erro http: " + nextProps.users.error);
+      } else {
+        this.setObject(nextProps.users.pop());
+      }
+    } else if (this.props.permissions !== nextProps.permissions) {
+      this.setState({ permissions: nextProps.permissions, showProgress: false });
     }
-
   }
 
   setObject = (userReceived) => {
     let user;
     let isNull = false;
-    if (userReceived === null) {
+    if (userReceived === null || userReceived.createdAt === undefined) {
       isNull = true;
       user = {
         id: 0,
         name: null,
         login: null,
-        password: null
+        password: null,
+        permissions: []
       };
     } else {
       user = userReceived;
+      if (user.permissions === null || user.permissions === undefined)
+        user.permissions = [];
     }
     let backupUser = {
       id: user.id,
       name: user.name,
       login: user.login,
-      password: user.password
+      password: user.password,
+      createdAt: user.createdAt,
+      modifiedAt: user.modifiedAt,
+      permissions: user.permissions
     };
     if (isNull) {
       this.setState( { object: user, backupObject: backupUser, crudMode: crudMode.edit } );
@@ -78,10 +95,21 @@ class InsertUserScreen extends InsertObjectScreen {
       id: this.state.backupObject.id,
       name: this.state.backupObject.name,
       login: this.state.backupObject.login,
-      password: this.state.backupObject.password
+      password: this.state.backupObject.password,
+      createdAt: this.state.backupObject.createdAt,
+      modifiedAt: this.state.backupObject.modifiedAt,
+      permissions: this.state.backupObject.permissions
     };
 
     this.setState({ object: user });
+  };
+
+  getDeleteMessage = () => {
+    return "Deseja realmente deletar o usuário?";
+  };
+
+  getDefaultScreenBack = () => {
+    return constNavigation.users.route;
   };
 
   getScreenBack = () => {
@@ -113,110 +141,11 @@ class InsertUserScreen extends InsertObjectScreen {
     this.setState( { user } );
   };
 
-  handleClickEditButton = () => {
-    this.setState({ crudMode: crudMode.edit, showBackButton: false });
+  handleChangePermissions = (permissions) => {
+    let user = this.state.object;
+    user.permissions = permissions !== undefined && permissions !== null ? permissions : [];
+    this.setState( { user } );
   }
-
-  handleClickSaveButton = () => {
-    this.setObject(this.state.object);
-    this.setState( { crudMode: crudMode.view, showBackButton: true } );
-  }
-
-  handleClickCancelButton = () => {
-    this.restoreBackupObject();
-    this.setState( { crudMode: crudMode.view, showBackButton: true } );
-  }
-
-  renderNameHeader = () => {
-    if (this.state.crudMode === crudMode.view) {
-      return(
-        <Text style={styles.textName}>
-          { this.state.object.name }
-        </Text>
-      );
-    } else if (this.state.crudMode == crudMode.edit) {
-      return(
-        <TextInput 
-          style={styles.textNameEdit} 
-          value={ this.state.object.name }
-          onChangeText={this.handleChangeName}
-          placeholder={"Insira o nome do usuário"}
-          placeholderTextColor={"white"}
-          underlineColorAndroid={"white"} />
-      );
-    }
-  };
-
-  renderId = () => {
-    if (this.state.crudMode != crudMode.view) return null;
-
-    return(
-      <View style={{ flexDirection: 'row' }}>
-        <Text style={ this.state.crudMode == crudMode.view ? styles.textId : styles.textIdEdit }>
-          { this.state.object.id }
-        </Text>
-
-        {/* separator */}
-        <View style={{ 
-          backgroundColor: 'white', 
-          height: 55, 
-          width: 2 }} />
-      </View>
-    );
-  };
-
-  renderHeader = () => {
-    return(
-      <View style={ styles.header } >
-        { this.renderId() }
-        { this.renderNameHeader() }
-      </View>
-    );
-  };
-
-  renderViewActions = () => {
-    return(
-      <View style={styles.actions}>
-
-        <TouchableOpacity 
-          style={styles.actionsButton}
-          onPress={this.handleClickEditButton}>
-          <Image source={editImg} style={styles.imgButtons}/>
-        </TouchableOpacity>
-
-      </View>
-    );
-  };
-
-  renderEditActions = () => {
-    return(
-      <View style={styles.actions}>
-
-        <TouchableOpacity 
-          style={styles.actionsButton} 
-          onPress={this.handleClickCancelButton}>
-          <Image source={cancelImg} style={styles.imgButtons}/>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.actionsButton}
-          onPress={this.handleClickSaveButton}>
-          <Image source={saveImg} style={styles.imgButtons}/>
-        </TouchableOpacity>
-
-      </View>
-    );
-  };
-
-  renderActions = () => {
-    if (!this.state.isKeyboardHide) return null;
-
-    if (this.state.crudMode == crudMode.view) {
-      return this.renderViewActions();
-    } else if (this.state.crudMode == crudMode.edit) {
-      return this.renderEditActions();
-    }
-  };
 
   renderBody = () => {
 
@@ -239,6 +168,17 @@ class InsertUserScreen extends InsertObjectScreen {
             onChangeText={this.handleChangePassword}
             editable={this.state.crudMode == crudMode.edit} />
             
+            <View style={styles.dropdown}>
+                <DropdownSelectItems
+                    dropdownTitle={"Nenhuma permissão selecionado"}
+                    modalTitle={"Selecione uma permissão"}
+                    multipleSelection={true}
+                    editable={this.state.crudMode == crudMode.edit}
+                    items={this.state.permissions}
+                    selectedItems={this.state.object.permissions}
+                    handleChangeSelectedItems={this.handleChangePermissions} />
+            </View>
+                
             <TouchableOpacity 
               style={styles.touchButton}
               onPress={this.handleClickSaveButton}>
@@ -251,4 +191,10 @@ class InsertUserScreen extends InsertObjectScreen {
 
 }
 
-export default InsertUserScreen
+// export default InsertUserScreen
+
+function mapStateToProps({ users, permissions }) {
+  return { users, permissions };
+}
+
+export default connect(mapStateToProps, actions)(InsertUserScreen);

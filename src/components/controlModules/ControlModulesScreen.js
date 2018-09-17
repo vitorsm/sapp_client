@@ -8,11 +8,20 @@ import {
 import ObjectScreen from '../crud/ObjectScreen';
 import Constants, { constNavigation } from '../../Constants';
 
+
+import { connect } from 'react-redux';
+import * as actions from "../../actions";
+
+
 const img = require('../../../imgs/control_modules.png');
 
 class ControlModulesScreen extends ObjectScreen {
     constructor(props) {
         super(props);
+
+        // let store = this.props.navigation.getParam('store', null);
+        // // this.props.store = store;
+        // this.setProps({ store });
 
         this.state = {
             objects: [],
@@ -21,6 +30,7 @@ class ControlModulesScreen extends ObjectScreen {
             title: "Módulos de controle"
         };
     }
+    
     
     componentWillMount() {
 
@@ -93,4 +103,10 @@ class ControlModulesScreen extends ObjectScreen {
 
 }
 
-export default ControlModulesScreen;
+// export default ControlModulesScreen;
+
+function mapStateToProps({ accountLogin }) {
+    return { accountLogin };
+}
+
+export default connect(mapStateToProps, actions)(ControlModulesScreen);

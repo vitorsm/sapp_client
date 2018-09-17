@@ -10,6 +10,7 @@ import Constants, { constNavigation } from '../../Constants';
 import InsertObjectScreen, { styles, crudMode } from '../crud/InsertObjectScreen';
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 import DropdownSelectItems from '../selectItems/DropdownSelectItems';
+import ConditionItem from '../condition/ConditionItem';
 
 const groupTypes = [
     { 
@@ -62,7 +63,8 @@ class InsertEventScreen extends InsertObjectScreen {
                 description: null,
                 groupType: null,
                 active: false,
-                place: null
+                place: null,
+                eventConditions: []
             };
         }
 
@@ -72,7 +74,8 @@ class InsertEventScreen extends InsertObjectScreen {
             description: event.description,
             groupType: event.groupType,
             active: event.active,
-            place: event.place
+            place: event.place,
+            eventConditions: event.eventConditions
         };
 
         if (isNull) {
@@ -89,7 +92,8 @@ class InsertEventScreen extends InsertObjectScreen {
             description: this.state.description,
             groupType: this.state.groupType,
             active: this.state.active,
-            place: this.state.place
+            place: this.state.place,
+            eventConditions: this.state.eventConditions
         };
 
         this.setState( { object: event } );

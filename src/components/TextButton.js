@@ -14,29 +14,35 @@ class TextButton extends Component {
 
         this.state = {
             text: null,
-            backgroundColor: null
+            backgroundColor: null,
+            smallButton: false
         };
     }
 
     componentWillMount() {
         this.setState({ 
             text: this.props.text,
-            backgroundColor: this.props.backgroundColor !== undefined ? this.props.backgroundColor : defaultBackgroundColor
+            backgroundColor: this.props.backgroundColor !== undefined ? this.props.backgroundColor : defaultBackgroundColor,
+            smallButton: this.props.smallButton
          });
     }
 
     componentWillReceiveProps(nextProps) {
         if (nextProps.text !== this.props.text) {
             this.setState({ text: nextProps.text });
-        } else if (nextProps.backgroundColor !== this.props.backgroundColor) {
+        } 
+        if (nextProps.backgroundColor !== this.props.backgroundColor) {
             this.setState({ backgroundColor: nextProps.backgroundColor !== undefined ? nextProps.backgroundColor : defaultBackgroundColor });
+        }
+        if (nextProps.smallButton !== this.props.smallButton) {
+            this.setState({ smallButton: nextProps.smallButton });
         }
     }
 
     render() {
         return(
             <TouchableOpacity 
-                style={[styles.touchButton, { backgroundColor: this.state.backgroundColor }]}
+                style={[this.state.smallButton ? styles.smallTouchButton : styles.touchButton, { backgroundColor: this.state.backgroundColor }]}
                 onPress={this.props.onPress}>
 
                 <Text style={styles.text}>{this.state.text}</Text>
@@ -55,7 +61,14 @@ const styles = StyleSheet.create({
     },
     text: {
         color: 'white',
-        fontSize: 14
-    }
+        fontSize: 16
+    },
+    smallTouchButton: {
+        // justifyContent: 'center',
+        // alignItems: 'center',
+        // alignSelf: 'center',
+        padding: 10,
+        // margin: 5,
+    },
 });
 export default TextButton;

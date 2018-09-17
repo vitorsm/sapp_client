@@ -119,6 +119,7 @@ class ConditionDialog extends Component {
     render() {
         return(
             <Modal
+                style={{ flex: 1 }}
                 animationType="slide"
                 transparent={true}
                 visible={this.state.visible}
@@ -141,6 +142,7 @@ const styles = StyleSheet.create({
         padding: 30
     },
     containerFoward: {
+        flex: 1,
         borderRadius: 5,
         minWidth: '98%',
         // borderWidth: 2,

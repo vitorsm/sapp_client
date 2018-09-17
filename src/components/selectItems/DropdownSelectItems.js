@@ -80,9 +80,12 @@ class DropdownSelectItems extends Component {
 
     handleOkClick = (selectedItems) => {
         this.setState( { selectedItems, showModal: false } );
+        if (this.props.handleChangeSelectedItems !== undefined)
+            this.props.handleChangeSelectedItems(selectedItems);
     };
 
     renderText = () => {
+        
         if (!this.state.multipleSelection) {
 
             return this.state.selectedItems !== undefined && this.state.selectedItems !== null 
@@ -144,7 +147,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 10,
         flexDirection: 'row',
-        borderRadius: 5
+        borderRadius: 5        
     },
     textView: {
         flex: 5,

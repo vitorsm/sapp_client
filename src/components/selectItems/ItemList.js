@@ -31,6 +31,7 @@ class ItemList extends Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.selected !== this.props.selected) {
             this.setState( { selected: nextProps.selected} );
+
         } else if (nextProps.item !== this.props.item) {
             this.setState( { item: nextProps.item } );
         }
