@@ -23,6 +23,7 @@ class DropdownSelectItemsScreen extends Component {
             backgroundColor: defualtBackgroundColor,
             items: [],
             selectedItems: [],
+            selectedItem: null,
             showModal: false,
             editable: true,
             textAddButton: null
@@ -34,6 +35,7 @@ class DropdownSelectItemsScreen extends Component {
         this.setState( { 
             items: this.props.items !== undefined && this.props.items !== null ? this.props.items : [],
             selectedItems: this.props.items !== undefined && this.props.items !== null ? this.props.items : [],
+            selectedItem: this.props.selectedItem !== undefined && this.props.selectedItem !== null ? this.props.selectedItem : [],
             multipleSelection: this.props.multipleSelection,
             backgroundColor: this.props.backgroundColor !== undefined ? this.props.backgroundColor : defualtBackgroundColor,
             modalTitle: this.props.modalTitle,
@@ -49,6 +51,8 @@ class DropdownSelectItemsScreen extends Component {
             this.setState( { items: nextProps.items !== undefined && nextProps.items !== null ? nextProps.items : [] } );
         } else if (nextProps.selectedItems !== this.props.selectedItems) {
             this.setState( { selectedItems: nextProps.selectedItems !== undefined && nextProps.selectedItems !== null ? nextProps.selectedItems : [] } );
+        } else if (nextProps.selectedItem !== this.props.selectedItem) {
+            this.setState( { selectedItem: nextProps.selectedItem !== undefined && nextProps.selectedItem !== null ? nextProps.selectedItem : [] } );
         } else if (nextProps.multipleSelection !== this.props.multipleSelection) {
             this.setState( { multipleSelection: nextProps.multipleSelection } );
         } else if (nextProps.backgroundColor !== this.props.backgroundColor) {

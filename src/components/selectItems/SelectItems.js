@@ -68,7 +68,7 @@ class SelectItems extends Component {
         }
         if (nextProps.selectedItems !== this.props.selectedItems) {
             this.setState( { 
-                selectedItems: nextProps.selectedItems !== undefined && nextProps.selectedItems !== null ? nextProps.selectedItems : [], 
+                selectedItems: nextProps.selectedItems ? nextProps.selectedItems : [], 
                 backupSelectedItems: this.copyItems(nextProps.selectedItems) 
             } );
         } 
@@ -114,18 +114,25 @@ class SelectItems extends Component {
     handleClickSelectAll = () => {
         let selectedItems = [];
         
-        if (this.state.items.length !== this.state.selectedItems.length) {
+        if (this.state.multipleSelection && this.state.items.length !== this.state.selectedItems.length) {
             this.state.items.map( item => selectedItems.push(item) );
         }
 
         this.setState( { selectedItems } );
+
+        if (!this.state.multipleSelection) {
+            this.handleClickItem(null);
+        }
     }
 
     handleClickItem = (item) => {
 
         if (this.state.mode === selectMode.listMode) {
             if (!this.state.multipleSelection) {
-                let list = [item];
+                let list = [];
+                if (item !== null)
+                    list.push(item);
+
                 this.props.okOnPress(list);
             }
     
@@ -150,7 +157,6 @@ class SelectItems extends Component {
         this.state.items.filter(item => item.name.toUpperCase().includes(text.toUpperCase()))
         .map(item => itemsFiltered.push(item));
 
-        alert("filtrados: " + itemsFiltered.length);
         this.setState( { itemsFiltered } );
     };
 
@@ -167,8 +173,7 @@ class SelectItems extends Component {
     };
 
     getIndexSelectedItem = (item) => {
-        if (this.state.selectedItems === undefined || this.state.selectedItems === null) return -1;
-
+        if (item === null || this.state.selectedItems === undefined || this.state.selectedItems === null) return -1;
         
         for (let i = 0; i < this.state.selectedItems.length; i++) {
             if (this.state.selectedItems[i].id === item.id) {
@@ -180,11 +185,14 @@ class SelectItems extends Component {
     };
 
     renderSelectAll = () => {
-        if (!this.state.multipleSelection || this.state.mode === selectMode.screenMode) return null;
         let text = "Remover seleção";
 
-        if (this.state.items.length !== this.state.selectedItems.length) {
+        if (this.state.multipleSelection && this.state.items.length !== this.state.selectedItems.length) {
             text = "Selcionar tudo";
+        }
+
+        if (!this.state.multipleSelection) {
+            text = "Limpar seleção";
         }
 
         return(
@@ -228,7 +236,7 @@ class SelectItems extends Component {
     };
 
     renderItems = () => {
-        if (this.state.itemsFiltered === undefined || this.state.itemsFiltered === null) return null;
+        if (!this.state.itemsFiltered) return null;
 
         return this.state.itemsFiltered.map( (item, i) => {
             return (

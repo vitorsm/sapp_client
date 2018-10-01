@@ -8,6 +8,10 @@ import {
 import Constants, { constNavigation } from '../../Constants';
 import ObjectScreen from '../crud/ObjectScreen';
 
+import { connect } from 'react-redux';
+import * as actions from "../../actions";
+import { request } from '../../actions';
+
 const img = require('../../../imgs/places.png');
 class PlacesScreen extends ObjectScreen {
     constructor(props) {
@@ -22,31 +26,50 @@ class PlacesScreen extends ObjectScreen {
     }
 
     componentWillMount() {
-        let objects = [
-            {
-                id: 1,
-                name: "Apartamento 302",
-                description: "Meu barraco",
-                area: "56",
-                parentPlace: null
-            },
-            {
-                id: 2,
-                name: "Sala de TV",
-                description: "Sala onde fica a TV do barraco",
-                area: "12",
-                parentPlace: {
-                    id: 1,
-                    name: "Apartamento 302",
-                    description: "Meu barraco",
-                    area: "56",
-                    parentPlace: null
-                }
-            },
+        // let objects = [
+        //     {
+        //         id: 1,
+        //         name: "Apartamento 302",
+        //         description: "Meu barraco",
+        //         area: "56",
+        //         parentPlace: null
+        //     },
+        //     {
+        //         id: 2,
+        //         name: "Sala de TV",
+        //         description: "Sala onde fica a TV do barraco",
+        //         area: "12",
+        //         parentPlace: {
+        //             id: 1,
+        //             name: "Apartamento 302",
+        //             description: "Meu barraco",
+        //             area: "56",
+        //             parentPlace: null
+        //         }
+        //     },
 
-        ];
+        // ];
 
-        this.setState({ objects, objectsFilter: objects });
+        this.props.fetchDefault(request.fetchPlaces);
+        this.setState({ showProgress: true });
+        // this.setState({ objects, objectsFilter: objects });
+    }
+
+    componentWillReceiveProps(nextProps) {
+
+        if (nextProps.places !== this.props.places) {
+            if (nextProps.places.error !== undefined) {
+                this.setState({ showProgress: false });
+                alert("Erro http: " + nextProps.places.error);
+            } else {
+                this.setState({ 
+                    objects: nextProps.places,
+                    objectsFilter: nextProps.places,
+                    showProgress: false
+                });
+            }
+        }
+
     }
 
     static navigationOptions = {
@@ -59,4 +82,8 @@ class PlacesScreen extends ObjectScreen {
     };
 }
 
-export default PlacesScreen;
+function mapStateToProps({ places }) {
+    return { places };
+  }
+  
+  export default connect(mapStateToProps, actions)(PlacesScreen);

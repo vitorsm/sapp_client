@@ -17,6 +17,10 @@ import SeparatorGroupCrud from '../SeparatorGroupCrud';
 import RadioForm, {RadioButton, RadioButtonInput, RadioButtonLabel} from 'react-native-simple-radio-button';
 import TextButton from '../TextButton';
 
+import { connect } from 'react-redux';
+import * as actions from "../../actions";
+import { request } from '../../actions';
+
 const groupTypes = [
     { 
         value: 0,
@@ -26,7 +30,7 @@ const groupTypes = [
     {
         value: 1,
         label: "ou",
-        id: 'O'
+        id: 'OU'
     }
 ];
 
@@ -41,12 +45,33 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             description: " do instrumento",
             title: "Cadastro de instrumento",
             isKeyboardHide: true,
-            objectBack: null
+            objectBack: null,
+            pinTypes: [],
+            instruments: [] // buscar isso
         };
     }
 
     componentWillMount() {
         super.componentWillMount();
+
+        this.props.fetchDefault(request.fetchPinTypes);
+
+        this.setState({ showProgress: true });
+    }
+
+    componentWillReceiveProps(nextProps) {
+
+        if (nextProps.pinTypes !== this.props.pinTypes) {
+            if (nextProps.pinTypes.error !== undefined) {
+                this.setState({ showProgress: false });
+                alert("Erro http: " + nextProps.pinTypes.error);
+            } else {
+                this.setState({ 
+                    showProgress: false,
+                    pinTypes: nextProps.pinTypes
+                 });
+            }
+        }
     }
 
     setObject = (instrumentReceived) => {
@@ -66,8 +91,15 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                 isPowered: true,
                 pinType: null,
                 setPoint: null,
-                pidControl: null,
-                powerConditions: null
+                pidControl: {
+                    kp: "0",
+                    ki: "0",
+                    kd: "0",
+                    sampleTime: "0",
+                    input: null
+                },
+                powerConditions: null,
+                powerConditionsGroupType: groupTypes[0].id
             };
         }
         
@@ -81,7 +113,8 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             pinType: instrument.pinType,
             setPoint: instrument.setPoint,
             pidControl: instrument.pidControl,
-            powerConditions: instrument.powerConditions
+            powerConditions: instrument.powerConditions,
+            powerConditionsGroupType: instrument.powerConditionsGroupType
         };
 
         if (isNull) {
@@ -102,7 +135,8 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             pinType: this.state.backupObject.pinType,
             setPoint: this.state.backupObject.setPoint,
             pidControl: this.state.backupObject.pidControl,
-            powerConditions: this.state.backupObject.powerConditions
+            powerConditions: this.state.backupObject.powerConditions,
+            powerConditionsGroupType: this.state.backupObject.powerConditionsGroupType
         };
 
         this.setState({ object });
@@ -111,7 +145,26 @@ class InsertInstrumentScreen extends InsertObjectScreen {
     getDefaultScreenBack = () => {
         return constNavigation.insertControlModule.route;
     };
-    
+
+    getDeleteMessage = () => {
+        return "Deseja deletar o instrumento do módulo de controle ?";
+    };
+
+    deleteObject = (object) => {
+        object.deleted = true;
+    };
+
+    getGroupTypeValueById = () => {
+
+        if (this.state.object 
+            && this.state.object.powerConditionsGroupType === groupTypes[1].id) {
+            return 1;
+        } else {
+            return 0;
+        }
+
+    };
+
     // TO DO
     //();
     //handle changes
@@ -136,6 +189,12 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         this.setState({ object });
     };
 
+    handleChangeHistorySampleTime = (text) => {
+        let object = this.state.object;
+        object.historySampleTime = text;
+        this.setState({ object });
+    }
+
     handleClickAddCondition = () => {
         let object = this.state.object;
 
@@ -158,38 +217,101 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         this.setState({ object });
     };
 
+    handleChangeKp = (text) => {
+        let object = this.state.object;
+        object.pidControl.kp = text;
+        this.setState({ object });
+    };
+
+    handleChangeKi = (text) => {
+        let object = this.state.object;
+        object.pidControl.ki = text;
+        this.setState({ object });
+    };
+
+    handleChangeKd = (text) => {
+        let object = this.state.object;
+        object.pidControl.kd = text;
+        this.setState({ object });
+    };
+
+    handleChangePinType = (pinTypeList) => {
+        let object = this.state.object;
+
+        if (pinTypeList && pinTypeList.length > 0) {
+            object.pinType = pinTypeList[0];
+        } else {
+            object.pinType = null;
+        }
+
+        this.setState({ object });
+    }
+
+    handleChangeInput = (inputList) => {
+        let object = this.state.object;
+
+        if (inputList && inputList.length > 0) {
+            object.pidControl.input = inputList[0];
+        } else {
+            object.pidControl.input = null;
+        }
+
+        this.setState({ object });
+    };
+
+    handleChangeSetPoint = (text) => {
+        let object = this.state.object;
+        object.setPoint = text;
+        this.setState({ object });
+    }
+
+    handleChangeGroupType = (value) => {
+        let object = this.state.object;
+        object.conditionsGroupType = groupTypes[value].id;
+        this.setState({ object });
+        console.log("novo obj", object);
+    }
+
     renderPIDParams = () => {
+        if (this.state.object.pinType.id !== 2) return null;
+
         return(
-            <View style={specifStyles.viewPID}>
+            <View>
                 <Text style={styles.inputLabel}>
-                    Kp
+                    Parametros PID
                 </Text>
-                <TextInput 
-                    keyboardType={"numeric"}
-                    value={this.state.object.historySampleTime}
-                    onChangeText={this.handleChangeHistorySampleTime}
-                    style={specifStyles.inputNumber}
-                    editable={this.state.crudMode === crudMode.edit} />
 
-                <Text style={styles.inputLabel}>
-                    Ki
-                </Text>
-                <TextInput 
-                    keyboardType={"numeric"}
-                    value={this.state.object.historySampleTime}
-                    onChangeText={this.handleChangeHistorySampleTime}
-                    style={specifStyles.inputNumber}
-                    editable={this.state.crudMode === crudMode.edit} />
+                <View style={specifStyles.viewPID}>
+                    <Text style={styles.inputLabel}>
+                        Kp
+                    </Text>
+                    <TextInput 
+                        keyboardType={"numeric"}
+                        value={this.state.object.pidControl.kp}
+                        onChangeText={this.handleChangeKp}
+                        style={specifStyles.inputNumber}
+                        editable={this.state.crudMode === crudMode.edit} />
 
-                <Text style={styles.inputLabel}>
-                    Kd
-                </Text>
-                <TextInput 
-                    keyboardType={"numeric"}
-                    value={this.state.object.historySampleTime}
-                    onChangeText={this.handleChangeHistorySampleTime}
-                    style={specifStyles.inputNumber}
-                    editable={this.state.crudMode === crudMode.edit} />
+                    <Text style={styles.inputLabel}>
+                        Ki
+                    </Text>
+                    <TextInput 
+                        keyboardType={"numeric"}
+                        value={this.state.object.pidControl.ki}
+                        onChangeText={this.handleChangeKi}
+                        style={specifStyles.inputNumber}
+                        editable={this.state.crudMode === crudMode.edit} />
+
+                    <Text style={styles.inputLabel}>
+                        Kd
+                    </Text>
+                    <TextInput 
+                        keyboardType={"numeric"}
+                        value={this.state.object.pidControl.kd}
+                        onChangeText={this.handleChangeKd}
+                        style={specifStyles.inputNumber}
+                        editable={this.state.crudMode === crudMode.edit} />
+                </View>
             </View>
         );
     };
@@ -214,6 +336,50 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             );
         });
     };
+
+
+    renderControlParams = () => {
+
+        if (!this.state.object || !this.state.object.pinType || 
+            (this.state.object.pinType.id !== 2 && this.state.object.pinType.id !== 3)) return null;
+
+        return(
+            <View>
+                <SeparatorGroupCrud isLine={true} text={"Parametros de controle"}/>
+
+                { this.renderPIDParams() }
+
+                <Text style={styles.inputLabel}>
+                    Entrada do controle
+                </Text>
+                <View style={styles.dropdown}>
+                    <DropdownSelectItems
+                        dropdownTitle={"Nenhum instrumento selecionado"}
+                        modalTitle={"Selecione um instrumento"}
+                        multipleSelection={false}
+                        editable={ this.state.crudMode == crudMode.edit }
+                        textAddButton={"ADD instrumento"}
+                        items={this.state.instruments}
+                        selectedItems={this.state.object.pidControl.input ? 
+                            [this.state.object.pidControl.input] :
+                            []
+                        }
+                        handleChangeSelectedItems={this.handleChangeInput} />
+                </View>
+
+                <Text style={styles.inputLabel}>
+                    Setpoint
+                </Text>
+                <TextInput 
+                    keyboardType={"numeric"}
+                    value={this.state.object.setPoint}
+                    onChangeText={this.handleChangeSetPoint}
+                    style={styles.inputNumber}
+                    editable={this.state.crudMode === crudMode.edit} />
+
+            </View>
+        );
+    }
 
     renderBody = () => {
         return(
@@ -240,7 +406,7 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                     placeholder={"Insira uma descrição para o instrumento"} />
 
                 <Text style={styles.inputLabel}>
-                    Tempo de amostragem (ms)
+                    Tempo de amostragem histórico (ms)
                 </Text>
                 <TextInput 
                     keyboardType={"numeric"}
@@ -248,7 +414,7 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                     onChangeText={this.handleChangeHistorySampleTime}
                     style={styles.input}
                     editable={this.state.crudMode === crudMode.edit}
-                    placeholder={"Informe um tempo de amostragem para o histórico"} />
+                    placeholder={"Tempo de amostragem para o histórico"} />
 
                 <View style={{ flexDirection: 'row', alignSelf: 'stretch' }}>
                     <Text style={styles.inputLabel}>
@@ -269,37 +435,18 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                         dropdownTitle={"Nenhum tipo selecionado"}
                         modalTitle={"Selecione um tipo"}
                         multipleSelection={false}
-                        editable={ this.state.crudMode == crudMode.edit } />
-                </View>
-
-                <Text style={styles.inputLabel}>
-                    Setpoint
-                </Text>
-                <TextInput 
-                    keyboardType={"numeric"}
-                    value={this.state.object.historySampleTime}
-                    onChangeText={this.handleChangeHistorySampleTime}
-                    style={styles.inputNumber}
-                    editable={this.state.crudMode === crudMode.edit} />
-
-                <SeparatorGroupCrud isLine={true} text={"Parametros de controle"}/>
-
-                <Text style={styles.inputLabel}>
-                    Parametros PID
-                </Text>
-                { this.renderPIDParams() }
-
-                <Text style={styles.inputLabel}>
-                    Entrada do controle
-                </Text>
-                <View style={styles.dropdown}>
-                    <DropdownSelectItems
-                        dropdownTitle={"Nenhum instrumento selecionado"}
-                        modalTitle={"Selecione um instrumento"}
-                        multipleSelection={false}
                         editable={ this.state.crudMode == crudMode.edit }
-                        textAddButton={"ADD instrumento"} />
+                        items={this.state.pinTypes}
+                        selectedItems={this.state.object && this.state.object.pinType ?
+                            [this.state.object.pinType] :
+                            []
+                        }
+                        handleChangeSelectedItems={this.handleChangePinType} />
                 </View>
+
+
+                { this.renderControlParams() }
+
 
                 <SeparatorGroupCrud isLine={true} text={"Condição de energia"}/>
                 
@@ -309,8 +456,8 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                 <View style={styles.input}>
                     <RadioForm
                         radio_props={groupTypes}
-                        initial={groupTypes[0].value}
-                        onPress={(value) => {this.setState({value:value})}}
+                        initial={this.getGroupTypeValueById()}
+                        onPress={(value) => {this.handleChangeGroupType(value)}}
                         buttonSize={10}
                         formHorizontal={true}
                         animation={false} />    
@@ -346,4 +493,9 @@ const specifStyles = StyleSheet.create({
     }
 });
 
-export default InsertInstrumentScreen;
+
+function mapStateToProps({ pinTypes }) {
+    return { pinTypes };
+}
+
+export default connect(mapStateToProps, actions)(InsertInstrumentScreen);

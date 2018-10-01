@@ -8,6 +8,7 @@ import ObjectScreen from '../crud/ObjectScreen';
 import Constants, { constNavigation } from '../../Constants';
 import { connect } from 'react-redux';
 import * as actions from "../../actions";
+import { request } from '../../actions';
 
 const img = require('../../../imgs/users.png');
 
@@ -26,7 +27,8 @@ class UsersScreen extends ObjectScreen {
 
     componentWillMount() {
 
-        this.props.fetchUsers();
+        // this.props.fetchUsers();
+        this.props.fetchDefault(request.fetchUsers);
         this.setState({ showProgress: true });
     }
 
@@ -57,7 +59,6 @@ class UsersScreen extends ObjectScreen {
     };
 }
 
-// export default UsersScreen;
 
 function mapStateToProps({ users }) {
   return { users };

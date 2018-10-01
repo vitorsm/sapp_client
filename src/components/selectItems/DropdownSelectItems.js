@@ -24,6 +24,7 @@ class DropdownSelectItems extends Component {
             backgroundColor: defualtBackgroundColor,
             items: [],
             selectedItems: [],
+            selectedItem: null,
             showModal: false,
             editable: true,
             textAddButton: null
@@ -35,6 +36,7 @@ class DropdownSelectItems extends Component {
         this.setState( { 
             items: this.props.items !== undefined && this.props.items !== null ? this.props.items : [],
             selectedItems: this.props.selectedItems !== undefined && this.props.selectedItems !== null ? this.props.selectedItems : [],
+            selectedItem: this.props.selectedItem !== undefined && this.props.selectedItem !== null ? this.props.selectedItem : [],
             multipleSelection: this.props.multipleSelection,
             backgroundColor: this.props.backgroundColor !== undefined ? this.props.backgroundColor : defualtBackgroundColor,
             modalTitle: this.props.modalTitle,
@@ -48,19 +50,37 @@ class DropdownSelectItems extends Component {
     componentWillReceiveProps(nextProps) {
         if (nextProps.items !== this.props.items) {
             this.setState( { items: nextProps.items !== undefined && nextProps.items !== null ? nextProps.items : [] } );
-        } else if (nextProps.selectedItems !== this.props.selectedItems) {
-            this.setState( { selectedItems: nextProps.selectedItems !== undefined && nextProps.selectedItems !== null ? nextProps.selectedItems : [] } );
-        } else if (nextProps.multipleSelection !== this.props.multipleSelection) {
+        } 
+        
+        if (nextProps.selectedItems !== this.props.selectedItems) {
+            this.setState( { selectedItems: nextProps.selectedItems ? nextProps.selectedItems : [] } );
+        } 
+        
+        if (nextProps.selectedItem !== this.props.selectedItem) {
+            this.setState( { selectedItem: nextProps.selectedItem !== undefined && nextProps.selectedItem !== null ? nextProps.selectedItem : [] } );
+        } 
+        
+        if (nextProps.multipleSelection !== this.props.multipleSelection) {
             this.setState( { multipleSelection: nextProps.multipleSelection } );
-        } else if (nextProps.backgroundColor !== this.props.backgroundColor) {
+        } 
+        
+        if (nextProps.backgroundColor !== this.props.backgroundColor) {
             this.setState( { backgroundColor: nextProps.backgroundColor } );
-        } else if (nextProps.modalTitle !== this.props.modalTitle) {
+        } 
+        
+        if (nextProps.modalTitle !== this.props.modalTitle) {
             this.setState( { modalTitle: nextProps.modalTitle } );
-        } else if (nextProps.dropdownTitle !== this.props.dropdownTitle) {
+        } 
+        
+        if (nextProps.dropdownTitle !== this.props.dropdownTitle) {
             this.setState( { dropdownTitle: nextProps.dropdownTitle } );
-        } else if (nextProps.editable !== this.props.editable) {
+        } 
+        
+        if (nextProps.editable !== this.props.editable) {
             this.setState( { editable: nextProps.editable !== undefined ? nextProps.editable : true } );
-        } else if (nextProps.textAddButton !== this.props.textAddButton) {
+        } 
+        
+        if (nextProps.textAddButton !== this.props.textAddButton) {
             this.setState( { textAddButton: nextProps.textAddButton !== undefined ? nextProps.textAddButton : null } );
         }
     }
@@ -134,7 +154,8 @@ class DropdownSelectItems extends Component {
                         cancelOnPress={this.handleCancelClick}
                         okOnPress={this.handleOkClick}
                         textAddButton={this.state.textAddButton}
-                        mode={selectMode.listMode} />
+                        mode={selectMode.listMode}
+                        addButtonOnPress={this.props.addButtonOnPress} />
                 </View>
             </TouchableOpacity>
         );

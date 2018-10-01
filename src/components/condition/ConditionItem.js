@@ -39,10 +39,10 @@ class ConditionItem extends Component {
 
     componentWillMount() {
         this.setState({
-            show: this.props.show !== undefined ? this.props.show : false,
+            show: this.props.show ? this.props.show : false,
             title: this.props.title,
-            editable: this.props.editable !== undefined ? this.props.editable : false,
-            condition: this.props.condition !== undefined ? this.props.condition : null
+            editable: this.props.editable ? this.props.editable : false,
+            condition: this.props.condition ? this.props.condition : null
         });
     }
 
@@ -60,6 +60,37 @@ class ConditionItem extends Component {
         if (nextProps.condition !== this.props.condition) {
             this.setState({ condition: nextProps.condition });
         }
+
+    }
+
+    handleChangeValue = (value) => {
+        let condition = this.state.condition;
+        condition.value = value;
+        this.setState({ condition });
+    };
+
+    handleChangeInput = (inputList) => {
+        let condition = this.state.condition;
+
+        if (inputList && inputList.length > 0) {
+            condition.input = inputList[0];
+        } else {
+            condition.input = null;
+        }
+
+        this.setState({ condition });
+    };
+
+    handleChangeOperationType = (operationTypeList) => {
+        let condition = this.state.condition;
+
+        if (operationTypeList && operationTypeList.length > 0) {
+            condition.operationType = operationTypeList[0];
+        } else {
+            condition.operationType = null;
+        }
+
+        this.setState({ condition });
     }
 
     render() {
@@ -94,9 +125,10 @@ class ConditionItem extends Component {
                         multipleSelection={false}
                         editable={this.state.editable}
                         selectedItems={
-                            this.state.condition !== null && this.state.condition.input !== null ? 
+                            this.state.condition && this.state.condition.input ? 
                             [this.state.condition.input] : null 
-                        } />
+                        }
+                        handleChangeSelectedItems={this.handleChangeInput} />
                 </View>
 
                 <Text style={styles.inputLabel}>
@@ -110,10 +142,11 @@ class ConditionItem extends Component {
                         items={operationTypes}
                         editable={this.state.editable}
                         selectedItems={
-                            this.state.condition != null && this.state.condition.operationType !== null ?
+                            this.state.condition && this.state.condition.operationType ?
                             [this.state.condition.operationType] :
                             null
-                        } />
+                        }
+                        handleChangeSelectedItems={this.handleChangeOperationType} />
                 </View>
                 
                 <View style={{ flexDirection: 'row' }}>

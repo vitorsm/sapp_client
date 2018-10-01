@@ -63,7 +63,10 @@ class ObjectScreen extends Component {
     }
 
     renderListItems = () => {
-        if (this.state.objectsFilter === null || this.state.objectsFilter === undefined || this.state.objectsFilter.length === 0) {
+        if (this.state.objectsFilter === null || 
+          this.state.objectsFilter === undefined || 
+          this.state.objectsFilter.length === 0 ||
+          this.state.objectsFilter.map == undefined) {
           return(
             <View style={{ alignItems: 'center', justifyContent: 'center', marginTop: 50 }}>
               <Image source={notImg}/>

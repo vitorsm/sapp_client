@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as actions from "../../actions";
+// import { request } from 
+import { request } from '../../actions';
+
 import {
   StyleSheet,
   Text,
@@ -50,16 +53,25 @@ class LoginScreen extends Component {
 
     handleLoginButton = () => {
         this.setState({ showProgress: true });
-
-        this.props.fetchAccountLogin({
+        
+        let credentials = {
             login: this.state.loginText,
-            password: this.state.passwordText
-        });
+            password: this.state.passwordText 
+        };
+
+        this.props.fetchDefault(request.fetchAccountLogin, credentials);
 
     };
 
     handleForgotPasswordButton = () => {
         alert("clicou no bt esqueci minha senha");
+    };
+
+    handleDebugMode = () => {
+        this.setState({ showProgress: true });
+
+        // this.props.fetchDebugLogin();
+        this.props.fetchDefault(request.fetchDebugLogin);
     };
 
     renderProgress = () => { 
@@ -86,6 +98,12 @@ class LoginScreen extends Component {
                 <TouchableOpacity onPress={this.handleForgotPasswordButton}>
                     <Text style={styles.textForgotPassword}>
                         Esqueci minha senha
+                    </Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={this.handleDebugMode}>
+                    <Text style={styles.textForgotPassword}>
+                        Entrar no modo debug
                     </Text>
                 </TouchableOpacity>
             </View>

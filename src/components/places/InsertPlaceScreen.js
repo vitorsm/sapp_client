@@ -8,6 +8,11 @@ import {
 } from 'react-native';
 import Constants, { constNavigation } from '../../Constants';
 import InsertObjectScreen, { crudMode, styles } from '../crud/InsertObjectScreen';
+import DropdownSelectItems from '../selectItems/DropdownSelectItems';
+
+import { connect } from 'react-redux';
+import * as actions from "../../actions";
+import { request } from '../../actions';
 
 class InsertPlaceScreen extends InsertObjectScreen {
     constructor(props) {
@@ -19,12 +24,20 @@ class InsertPlaceScreen extends InsertObjectScreen {
             crudMode: crudMode.view,
             isKeyboardHide: true,
             showBackButton: true,
-            objectBack: null
+            objectBack: null,
+            places: []
         };
     }
 
     componentWillMount() {
         super.componentWillMount();
+
+        this.props.fetchDefault(request.fetchPlaces);
+
+        this.setState({ 
+            saveRequest: request.sendPlace,
+            showProgress: true
+         });
     }
 
     componentDidMount() {
@@ -35,10 +48,22 @@ class InsertPlaceScreen extends InsertObjectScreen {
 
         if (this.props.crudMode !== nextProps.crudMode) {
             this.setState( { crudMode: nextProps.crudMode } );
-        } else if (this.props.place !== nextProps.place) {
-            this.setObject(nextProps.place);
         }
-
+        if (this.props.place !== nextProps.place) {
+            console.log("recebeu place", nextProps.place);
+            this.setObject(nextProps.place);
+            this.setState({ showProgress: false });
+        } 
+        if (this.props.places !== nextProps.places) {
+            if (nextProps.places.error !== undefined) {
+                this.setState({ showProgress: false });
+                alert("Erro http: " + nextProps.places.error);
+            } else {
+                // this.setObject(nextProps.places);
+                this.setState({ showProgress: false });
+                this.setPlaces(nextProps.places);
+            }
+        }
     }
 
     setObject = (placeReceived) => {
@@ -56,6 +81,7 @@ class InsertPlaceScreen extends InsertObjectScreen {
             };
         } else {
             place = placeReceived;
+            place.area = place.area + "";
         }
 
         let backupPlace = {
@@ -71,6 +97,17 @@ class InsertPlaceScreen extends InsertObjectScreen {
         } else {
             this.setState( { object: place, backupObject: backupPlace } );
         }
+
+        this.setPlaces(this.state.places, place);
+    };
+
+    getDeleteMessage = () => {
+        return "Deseja deletar esse local ?";
+    };
+
+    deleteObject = (object) => {
+        if (this.state.object)
+            this.props.fetchDefault(request.deletePlace, { id: this.state.object.id });
     };
 
     restoreBackupObject = () => {
@@ -85,11 +122,31 @@ class InsertPlaceScreen extends InsertObjectScreen {
         this.setState({ place });
     };
 
-    getScreenBack = () => {
-        let navScreenBack = this.props.navigation.getParam('screenBack', null);
+    setPlaces = (places, object) => {
+        let placesList = [];
 
-        return navScreenBack !== null ? 
-            navScreenBack : constNavigation.places.route;
+        if (object === undefined) {
+            object = this.state.object;
+        }
+
+        if (object === null) {
+            placesList = places;
+        } else if (places !== null) {
+            places.map(p => {
+                if (p.id !== object.id) {
+                    placesList.push(p);
+                }
+            });
+        }
+
+        this.setState({ places: placesList });
+    }
+    
+    getDefaultScreenBack = () => {
+        // let navScreenBack = this.props.navigation.getParam('screenBack', null);
+        
+        return this.state.objectBack && this.state.objectBack.screenBack ? 
+            this.state.objectBack.screenBack : constNavigation.places.route;
     };
     
     setObjectScreenBack = (objectBack) => {
@@ -114,20 +171,16 @@ class InsertPlaceScreen extends InsertObjectScreen {
         this.setState( { place } );
     };
 
-    handleClickEditButton = () => {
-        this.setState({ crudMode: crudMode.edit, showBackButton: false });
-    };
+    handleChangeSelectedItems = (selectedPlaces) => {
+        let object = this.state.object;
+        if (selectedPlaces === null || selectedPlaces.length === 0) {
+            object.parentPlace = null;
+        } else {
+            object.parentPlace = selectedPlaces[0];
+        }
 
-    handleClickSaveButton = () => {
-        this.setObject(this.state.object);
-        this.setState( { crudMode: crudMode.view, showBackButton: true } );
-    };
-
-    handleClickCancelButton = () => {
-        this.restoreBackupObject();
-        this.setState( { crudMode: crudMode.view, showBackButton: true } );
-    };
-
+        this.setState({ object });
+    }
 
     renderBody = () => {
 
@@ -150,11 +203,29 @@ class InsertPlaceScreen extends InsertObjectScreen {
                 onChangeText={this.handleChangeArea}
                 editable={this.state.crudMode == crudMode.edit} />
                 
-                <TouchableOpacity 
+                <Text style={styles.inputLabel}>
+                    Local pai
+                </Text>
+                <View style={styles.dropdown}>
+                    <DropdownSelectItems
+                        dropdownTitle={"Nenhum local pai selecionado"}
+                        modalTitle={"Selecione um local pai"}
+                        multipleSelection={false}
+                        editable={ this.state.crudMode == crudMode.edit }
+                        items={this.state.places}
+                        selectedItems={this.state.object.parentPlace !== null ? 
+                            [this.state.object.parentPlace] : 
+                                []
+                        }
+                        handleChangeSelectedItems={this.handleChangeSelectedItems}
+                        />
+                </View>
+
+                {/* <TouchableOpacity 
                   style={styles.touchButton}
                   onPress={this.handleClickSaveButton}>
                   <Text style={styles.buttons}>Add área filha</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
     
             </ScrollView>
         );
@@ -162,4 +233,8 @@ class InsertPlaceScreen extends InsertObjectScreen {
 
 }
   
-export default InsertPlaceScreen;
+function mapStateToProps({ places, place }) {
+    return { places, place };
+}
+
+export default connect(mapStateToProps, actions)(InsertPlaceScreen);

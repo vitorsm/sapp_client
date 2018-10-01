@@ -48,8 +48,9 @@ class InsertObjectScreen extends Component {
     //if objEdit !== null then setObject(objEdit) else setObject(objParent)
     //setObjectReturn();{ objParent, objEdit, objReturn, value, isEditing } pega o objReturn e trabalha 
     //o value é pra saber oq ta sendo retornado
-    //this.state.sendObject => this.props.sendAlgumaCoisa
-    //getDeleteMessage()
+    //this.state.saveRequest => request.algumaCoisa
+    //this.getDeleteMessage()
+    //this.deleteObject(object)
     
     componentWillMount() {
       if (this.props.crudMode != undefined) {
@@ -125,8 +126,21 @@ class InsertObjectScreen extends Component {
     };
 
     handleClickSaveButton = () => {
-      this.state.sendObject(this.state.object);
+      // this.state.sendObject(this.state.object);
+      
+      this.props.fetchDefault(this.state.saveRequest, this.state.object);
+
       this.setState( { crudMode: crudMode.view, showBackButton: true } );
+
+      this.setObject(this.state.object);
+
+      // let objectBack = this.state.objectBack;
+
+      // if (objectBack) {
+      //   objectBack.objReturn = this.state.object;
+      // }
+
+      // this.setState({ objectBack });
     }
   
     handleClickDeleteButton = () => {
@@ -137,7 +151,8 @@ class InsertObjectScreen extends Component {
         [
           {text: 'Não', onPress: () => { }, style: 'cancel'},
           {text: 'Sim', onPress: () => {
-            this.props.deleteUser(this.state.object);
+            // this.props.deleteUser(this.state.object);
+            this.deleteObject(this.state.object);
             this.props.navigation.navigate(this.getDefaultScreenBack());
           }},
         ],
@@ -292,6 +307,7 @@ class InsertObjectScreen extends Component {
               menuText={this.state.title}
               buttonView={buttonView.backWithoutFilter}
               screenBack={this.getScreenBack()}
+              // screenBack={this.getDefaultScreenBack()}
               showButton={true}
               objectScreenBack={this.state.objectBack}
               objectBackupReturn={this.state.backupObject}

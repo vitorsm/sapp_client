@@ -14,7 +14,7 @@ import Constants, {
 import TextButton from '../TextButton';
 import { connect } from 'react-redux';
 import * as actions from "../../actions";
-
+import { EMPTY_CHAR, CONTROL_MODULE_PORT, MESSAGE_TYPE_NETWORKS } from '../../BrokerConstants';
 
 
 class InsertCredentialsScreen extends Component {
@@ -30,18 +30,42 @@ class InsertCredentialsScreen extends Component {
         };
     }
 
+    buildCredentialsMessage = () => {
+        let buff = [];
+
+        buff = buff.concat(this.toUTF8Array(MESSAGE_TYPE_NETWORKS + ""));
+        buff.push(EMPTY_CHAR);
+
+        buff = buff.concat(this.toUTF8Array(this.state.ssid));
+        buff.push(EMPTY_CHAR);
+        
+        //  Nao sei pq, quando coloca isso nao funciona.
+        // buff = buff.concat(this.toUTF8Array("MAC"));
+        // buff.push(EMPTY_CHAR);
+
+        buff = buff.concat(this.toUTF8Array(this.state.wifiPassword));
+        buff.push(EMPTY_CHAR);
+
+        buff = buff.concat(this.toUTF8Array(this.state.deviceLogin));
+        buff.push(EMPTY_CHAR);
+
+        buff = buff.concat(this.toUTF8Array(this.state.devicePassword));
+        buff.push(EMPTY_CHAR);
+
+        return buff;
+    };
 
     sendCredentials = (data) => {
         let dgram = require('dgram');
         let socket = dgram.createSocket('udp4');
-        let port = 4421;
-        let address = "192.168.43.238";
+        let serverAddress = "192.168.4.1";
     
         socket.bind(4162);
     
-        var buf = this.toUTF8Array('excellent!')
-        socket.send(buf, 0, buf.length, port, address, function(err) {
-            //if (err) throw err
+        var buff = this.buildCredentialsMessage();
+
+        socket.send(buff, 0, buff.length, CONTROL_MODULE_PORT, serverAddress, function(err) {
+        // socket.send(buff, 0, buff.length, 4411, serverAddress, function(err) {
             console.log(err);
         });
     }

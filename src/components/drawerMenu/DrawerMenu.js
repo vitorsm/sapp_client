@@ -13,6 +13,7 @@ import Constants, { constNavigation } from '../../Constants';
 
 import { connect } from 'react-redux';
 import * as actions from "../../actions";
+import { request } from '../../actions';
 
 const accountIcon = require('../../../imgs/account.png');
 const exitIcon = require('../../../imgs/exit.png');
@@ -43,7 +44,7 @@ class DrawerMenu extends Component {
     }
 
     handleClickLogoffButton = () => {
-      this.props.fetchLogoff();
+      this.props.fetchDefault(request.fetchLogoff);
     };
 
     handleClickMenuItem = (route, index) => {

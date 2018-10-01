@@ -12,6 +12,7 @@ import Constants, { constNavigation } from '../../Constants';
 import InsertObjectScreen, { crudMode, styles } from '../crud/InsertObjectScreen';
 import { connect } from 'react-redux';
 import * as actions from "../../actions";
+import { request } from '../../actions';
 import DropdownSelectItems from '../selectItems/DropdownSelectItems';
 
 class InsertUserScreen extends InsertObjectScreen {
@@ -37,20 +38,23 @@ class InsertUserScreen extends InsertObjectScreen {
 
   componentWillMount() {
     super.componentWillMount();
-    this.props.fetchPermissions();
-    this.setState({ sendObject: this.props.sendUser, showProgress: true });
+    this.props.fetchDefault(request.fetchPermissions);
+    // this.props.fetchPermissions();
+    // this.setState({ sendObject: this.props.sendUser, showProgress: true });
+    this.setState({ saveRequest: request.sendUser, showProgress: true });
   }
 
   componentWillReceiveProps(nextProps) {
 
     if (this.props.crudMode !== nextProps.crudMode) {
       this.setState( { crudMode: nextProps.crudMode } );
-    } else if (this.props.users !== nextProps.users) {
+    } 
+    if (this.props.users !== nextProps.users) {
       if (nextProps.users.error !== undefined) {
         this.setState({ showProgress: false });
         alert("Erro http: " + nextProps.users.error);
       } else {
-        this.setObject(nextProps.users.pop());
+        this.setObject(nextProps.users);
       }
     } else if (this.props.permissions !== nextProps.permissions) {
       this.setState({ permissions: nextProps.permissions, showProgress: false });
@@ -60,7 +64,7 @@ class InsertUserScreen extends InsertObjectScreen {
   setObject = (userReceived) => {
     let user;
     let isNull = false;
-    if (userReceived === null || userReceived.createdAt === undefined) {
+    if (userReceived === undefined || userReceived === null || userReceived.createdAt === undefined) {
       isNull = true;
       user = {
         id: 0,
@@ -108,15 +112,13 @@ class InsertUserScreen extends InsertObjectScreen {
     return "Deseja realmente deletar o usuário?";
   };
 
-  getDefaultScreenBack = () => {
-    return constNavigation.users.route;
+  deleteObject = (object) => {
+    if (this.state.object)
+      this.props.fetchDefault(request.deleteUser, {id: this.state.object.id});
   };
 
-  getScreenBack = () => {
-    let navScreenBack = this.props.navigation.getParam('screenBack', null);
-
-    return navScreenBack !== null ? 
-      navScreenBack : constNavigation.users.route;
+  getDefaultScreenBack = () => {
+    return constNavigation.users.route;
   };
 
   setObjectScreenBack = (objectBack) => {

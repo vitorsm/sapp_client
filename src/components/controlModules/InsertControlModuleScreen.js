@@ -11,6 +11,10 @@ import Constants, { constNavigation } from '../../Constants';
 import DropdownSelectItems from '../selectItems/DropdownSelectItems';
 import DropdownSelectItemsScreen from '../selectItems/DropdownSelectItemsScreen';
 
+import { connect } from 'react-redux';
+import * as actions from "../../actions";
+import { request } from '../../actions';
+
 class InsertControlModuleScreen extends InsertObjectScreen {
 
     constructor(props) {
@@ -20,10 +24,12 @@ class InsertControlModuleScreen extends InsertObjectScreen {
             title: "Cadastrar módulo",
             crudMode: crudMode.view,
             object: null,
+            selectedPlaces: [],
             backupObject: null,
             description: " do módulo",
             isKeyboardHide: true,
-            objectBack: null
+            objectBack: null,
+            places: []
         };
     }
 
@@ -34,15 +40,41 @@ class InsertControlModuleScreen extends InsertObjectScreen {
 
     componentWillMount() {
         super.componentWillMount();
+        //fetch no que é necessario
+        // this.setState({ sendObject: this.props.sendControlModule, showProgress: false });
+        this.props.fetchDefault(request.fetchPlaces);
+        this.setState({ 
+            sendSave: request.sendControlModule,
+            showProgress: false
+        });
     }
 
     componentDidMount() {
         super.componentDidMount();
     }
 
+    componentWillReceiveProps(nextProps) {
+
+        if (nextProps.places !== this.props.places) {
+            if (nextProps.places.error !== undefined) {
+                this.setState({ showProgress: false });
+                alert("Erro http: " + nextProps.places.error);
+            } else {
+                this.setState({ 
+                    places: nextProps.places,
+                    showProgress: false
+                });
+            }
+        }
+
+    }
+
     setObject = (controlModuleReceived) => {
         let controlModule = null;
         let isNull = false;
+
+        console.log(controlModuleReceived);
+
         if (controlModuleReceived !== undefined && controlModuleReceived !== null) {
             controlModule = controlModuleReceived;
         } else {
@@ -54,8 +86,8 @@ class InsertControlModuleScreen extends InsertObjectScreen {
                 place: null,
                 login: null,
                 password: null,
-                // instruments: []
-                instruments: [{ id: 1, name: "teste" },{ id: 2, name: "teste2"}]
+                instruments: []
+                // instruments: [{ id: 1, name: "teste" },{ id: 2, name: "teste2"}]
             };
         }
 
@@ -77,6 +109,8 @@ class InsertControlModuleScreen extends InsertObjectScreen {
     };
 
     restoreBackupObject = () => {
+        if (!this.state.backupObject) return;
+        
         let controlModule = {
             id: this.state.backupObject.id,
             name: this.state.backupObject.name,
@@ -98,23 +132,38 @@ class InsertControlModuleScreen extends InsertObjectScreen {
     
     setObjectReturn = (objReturn, value, objParent) => {
         
-        if (value === "instrument") {
+        console.log(objReturn, value, objParent);
+        
+        if (value === "instrument" && objParent) {
             let object = objParent;
-
+            
             if (object.instruments === null) object.instruments = [];
             
-            let found = false;
+            if (objReturn && objReturn.id > 0) {
+                let found = false;
+                let index = -1;
 
-            object.instruments.filter( instrument => {
-                return instrument.id === objReturn.id
-            }).map( instrument => {
-                found = true;
-                instrument = objReturn
-            });
-
-            if (!found) {
-                object.instruments.push(objReturn);
+                object.instruments.filter( instrument => {
+                    return instrument.id === objReturn.id
+                }).map( (instrument, i) => {
+                    found = true;
+                    instrument = objReturn;
+                    index = i;
+                });
+    
+                if (!found) {
+                    object.instruments.push(objReturn);
+                } else if (objReturn.deleted) {
+                    object.instruments.splice(index, 1);
+                }
             }
+
+            this.setState({ object });
+
+        } else if (value === "place" && objParent) {
+            let object = objParent;
+
+            object.place = objReturn;
 
             this.setState({ object });
         }
@@ -148,15 +197,39 @@ class InsertControlModuleScreen extends InsertObjectScreen {
         this.props.navigation.navigate(constNavigation.insertInstrumentScreen.route, { object: objectBack });
     };
 
+    handleClickAddPlace = () => {
+        let objectBack = {
+            objEdit: null,
+            objParent: this.state.object,
+            value: "place",
+            screenBack: constNavigation.insertControlModule.route
+        };
+        
+        this.props.navigation.navigate(constNavigation.insertPlace.route, { object: objectBack });        
+    }
+
     handleClickAddInstrument = () => {
         let objectBack = {
             objEdit: null,
             objParent: this.state.object,
-            value: "instrument"
+            value: "instrument",
+            screenBack: constNavigation.insertControlModule.route
         };
         
-        this.props.navigation.navigate(constNavigation.insertInstrumentScreen.route, { object: objectBack });        
+        this.props.navigation.navigate(constNavigation.insertInstrumentScreen.route, { object: objectBack });
     };
+
+    handleChangeSelectedItems = (places) => {
+        let object = this.state.object;
+
+        if (places && places.length > 0) {
+            object.place = places[0];
+        } else {
+            object.place = null;
+        }
+
+        this.setState({ object });
+    }
 
     renderBody = () => {
         return(
@@ -198,9 +271,16 @@ class InsertControlModuleScreen extends InsertObjectScreen {
                     <DropdownSelectItems
                         dropdownTitle={"Nenhum local selecionado"}
                         modalTitle={"Selecione um local"}
-                        multipleSelection={true}
+                        multipleSelection={false}
                         editable={ this.state.crudMode == crudMode.edit }
-                        textAddButton={ "ADD local" } />
+                        textAddButton={ "ADD local" }
+                        items={this.state.places}
+                        selectedItems={this.state.object && this.state.object.place ? 
+                            [this.state.object.place] :
+                            []
+                        }
+                        handleChangeSelectedItems={this.handleChangeSelectedItems}
+                        addButtonOnPress={this.handleClickAddPlace} />
                 </View>
 
                 <Text style={styles.inputLabel}>
@@ -224,4 +304,8 @@ class InsertControlModuleScreen extends InsertObjectScreen {
     };
 } 
 
-export default InsertControlModuleScreen;
+function mapStateToProps({ controlModules, places }) {
+    return { controlModules, places };
+}
+
+export default connect(mapStateToProps, actions)(InsertControlModuleScreen);
