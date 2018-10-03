@@ -51,6 +51,7 @@ class InsertObjectScreen extends Component {
     //this.state.saveRequest => request.algumaCoisa
     //this.getDeleteMessage()
     //this.deleteObject(object)
+    //setObjectsParams(objParams); caso a tela precise de parametros extras para exibir essa funcao deve ser implementada
     
     componentWillMount() {
       if (this.props.crudMode != undefined) {
@@ -74,6 +75,8 @@ class InsertObjectScreen extends Component {
           // verificando se tem objectEdit, se tiver é ele q tem q setar
         } else if (objectBack.objEdit !== undefined) {
           this.setObject(objectBack.objEdit);
+          if (this.setObjectsParams)
+            this.setObjectsParams(objectBack.objParams)
         } else {
           this.setObject(objectBack.objParent);
         }

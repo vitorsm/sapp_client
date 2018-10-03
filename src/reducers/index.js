@@ -7,6 +7,8 @@ import controlModulesReducer from './controlModulesReducer';
 import placesReducer from './placesReducer';
 import placeReducer from './placeReducer';
 import pinTypesReducer from './pinTypesReducer';
+import controlModuleReducer from './controlModuleReducer';
+import instrumentsReducer from './instrumentsReducer';
 
 export default combineReducers({
     accountLogin: accountLoginReducer,
@@ -16,5 +18,7 @@ export default combineReducers({
     controlModules: controlModulesReducer,
     places: placesReducer,
     place: placeReducer,
-    pinTypes: pinTypesReducer
+    pinTypes: pinTypesReducer,
+    controlModule: controlModuleReducer,
+    instruments: instrumentsReducer
 });

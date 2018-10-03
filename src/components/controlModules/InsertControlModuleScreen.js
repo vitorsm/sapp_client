@@ -43,8 +43,9 @@ class InsertControlModuleScreen extends InsertObjectScreen {
         //fetch no que é necessario
         // this.setState({ sendObject: this.props.sendControlModule, showProgress: false });
         this.props.fetchDefault(request.fetchPlaces);
+
         this.setState({ 
-            sendSave: request.sendControlModule,
+            saveRequest: request.sendControlModule,
             showProgress: false
         });
     }
@@ -64,6 +65,17 @@ class InsertControlModuleScreen extends InsertObjectScreen {
                     places: nextProps.places,
                     showProgress: false
                 });
+            }
+        }
+        if (nextProps.controlModule !== this.props.controlModule) {
+            if (nextProps.controlModule.error !== undefined) {
+                this.setState({ showProgress: false });
+                alert("Erro http: " + nextProps.controlModule.error);
+            } else {
+                this.setState({
+                    showProgress: false
+                });
+                this.setObject(nextProps.controlModule);
             }
         }
 
@@ -137,14 +149,14 @@ class InsertControlModuleScreen extends InsertObjectScreen {
         if (value === "instrument" && objParent) {
             let object = objParent;
             
-            if (object.instruments === null) object.instruments = [];
+            if (!object.instruments) object.instruments = [];
             
-            if (objReturn && objReturn.id > 0) {
+            if (objReturn && objReturn.number > 0) {
                 let found = false;
                 let index = -1;
 
                 object.instruments.filter( instrument => {
-                    return instrument.id === objReturn.id
+                    return instrument.number === objReturn.number
                 }).map( (instrument, i) => {
                     found = true;
                     instrument = objReturn;
@@ -152,6 +164,7 @@ class InsertControlModuleScreen extends InsertObjectScreen {
                 });
     
                 if (!found) {
+                    objReturn.controlModuleId = object.id;
                     object.instruments.push(objReturn);
                 } else if (objReturn.deleted) {
                     object.instruments.splice(index, 1);
@@ -160,6 +173,7 @@ class InsertControlModuleScreen extends InsertObjectScreen {
 
             this.setState({ object });
 
+            console.log("novo object", object);
         } else if (value === "place" && objParent) {
             let object = objParent;
 
@@ -167,6 +181,8 @@ class InsertControlModuleScreen extends InsertObjectScreen {
 
             this.setState({ object });
         }
+
+
     }
 
     handleChangeDescription = (text) => {
@@ -213,7 +229,10 @@ class InsertControlModuleScreen extends InsertObjectScreen {
             objEdit: null,
             objParent: this.state.object,
             value: "instrument",
-            screenBack: constNavigation.insertControlModule.route
+            screenBack: constNavigation.insertControlModule.route,
+            objParams: {
+                instruments: []
+            }
         };
         
         this.props.navigation.navigate(constNavigation.insertInstrumentScreen.route, { object: objectBack });
@@ -230,6 +249,42 @@ class InsertControlModuleScreen extends InsertObjectScreen {
 
         this.setState({ object });
     }
+
+    renderInstrumentsDropdown = () => {
+        if (!this.state.object || this.state.object.id <= 0) {
+            return(
+                <View>
+                <Text style={styles.inputLabel}>
+                    Instrumentos
+                </Text>
+                
+                <View style={styles.dropdown}>
+                    <Text>É necessário cadastrar o módulo antes de cadastrar seus instrumentos.</Text>
+                </View>
+            </View>
+            );
+        }
+
+        return(
+            <View>
+                <Text style={styles.inputLabel}>
+                    Instrumentos
+                </Text>
+                
+                <View style={styles.dropdown}>
+                    <DropdownSelectItemsScreen
+                        items={this.state.object.instruments}
+                        dropdownTitle={"Nenhum local selecionado"}
+                        modalTitle={"Selecione um local"}
+                        multipleSelection={true}
+                        editable={ this.state.crudMode == crudMode.edit }
+                        textAddButton={ "ADD instrumento" }
+                        onPressItem={this.handleClickInstrumentItem}
+                        addButtonOnPress={this.handleClickAddInstrument} />
+                </View>
+            </View>
+        );
+    };
 
     renderBody = () => {
         return(
@@ -283,29 +338,15 @@ class InsertControlModuleScreen extends InsertObjectScreen {
                         addButtonOnPress={this.handleClickAddPlace} />
                 </View>
 
-                <Text style={styles.inputLabel}>
-                    Instrumentos
-                </Text>
-                {/* <View style={[styles.dropdown, { marginBottom: 20 }]}> */}
-                <View style={styles.dropdown}>
-                    <DropdownSelectItemsScreen
-                        items={this.state.object.instruments}
-                        dropdownTitle={"Nenhum local selecionado"}
-                        modalTitle={"Selecione um local"}
-                        multipleSelection={true}
-                        editable={ this.state.crudMode == crudMode.edit }
-                        textAddButton={ "ADD instrumento" }
-                        onPressItem={this.handleClickInstrumentItem}
-                        addButtonOnPress={this.handleClickAddInstrument} />
-                </View>
+                { this.renderInstrumentsDropdown() }
 
             </ScrollView>
         );
     };
 } 
 
-function mapStateToProps({ controlModules, places }) {
-    return { controlModules, places };
+function mapStateToProps({ controlModules, places, controlModule }) {
+    return { controlModules, places, controlModule };
 }
 
 export default connect(mapStateToProps, actions)(InsertControlModuleScreen);

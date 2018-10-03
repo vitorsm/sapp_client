@@ -6,3 +6,5 @@ export const FETCH_CONTROL_MODULES = "fetch_control_moduels";
 export const FETCH_PLACES = "fetch_places";
 export const FETCH_PLACE = "fetch_place";
 export const FETCH_PIN_TYPES = "fetch_pin_types";
+export const FETCH_CONTROL_MODULE = "fetch_control_module";
+export const FETCH_INSTRUMENTS = "fetch_instruments";

@@ -47,7 +47,7 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             isKeyboardHide: true,
             objectBack: null,
             pinTypes: [],
-            instruments: [] // buscar isso
+            instruments: [], // buscar isso
         };
     }
 
@@ -55,6 +55,7 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         super.componentWillMount();
 
         this.props.fetchDefault(request.fetchPinTypes);
+        this.props.fetchDefault(request.fetchInstruments);
 
         this.setState({ showProgress: true });
     }
@@ -81,6 +82,20 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         if (instrumentReceived !== undefined && instrumentReceived !== null) {
             instrument = instrumentReceived;
             isNull = false;
+
+            instrument.number = instrument.number + "";
+            
+            this.prepareCondition(instrument);
+
+            if (instrument.historySampleTime) {
+                instrument.historySampleTime = instrument.historySampleTime + "";
+            }
+
+            if (instrument.pidControl) {
+                instrument.pidControl.kp = instrument.pidControl.kp + "";
+                instrument.pidControl.ki = instrument.pidControl.ki + "";
+                instrument.pidControl.kd = instrument.pidControl.kd + "";
+            }
         } else {
             instrument = {
                 id: 0,
@@ -88,7 +103,7 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                 name: null,
                 description: null,
                 historySampleTime: null,
-                isPowered: true,
+                powered: true,
                 pinType: null,
                 setPoint: null,
                 pidControl: {
@@ -109,7 +124,7 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             name: instrument.name,
             description: instrument.description,
             historySampleTime: instrument.historySampleTime,
-            isPowered: instrument.isPowered,
+            powered: instrument.powered,
             pinType: instrument.pinType,
             setPoint: instrument.setPoint,
             pidControl: instrument.pidControl,
@@ -131,7 +146,7 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             name: this.state.backupObject.name,
             description: this.state.backupObject.description,
             historySampleTime: this.state.backupObject.historySampleTime,
-            isPowered: this.state.backupObject.isPowered,
+            powered: this.state.backupObject.powered,
             pinType: this.state.backupObject.pinType,
             setPoint: this.state.backupObject.setPoint,
             pidControl: this.state.backupObject.pidControl,
@@ -141,6 +156,14 @@ class InsertInstrumentScreen extends InsertObjectScreen {
 
         this.setState({ object });
     };
+
+    prepareCondition = (instrument) => {
+        if (instrument && instrument.powerConditions && instrument.powerConditions.map) {
+            instrument.powerConditions.map((condition, index) => {
+                condition.value = index;
+            });
+        } 
+    }
 
     getDefaultScreenBack = () => {
         return constNavigation.insertControlModule.route;
@@ -165,6 +188,14 @@ class InsertInstrumentScreen extends InsertObjectScreen {
 
     };
 
+    setObjectsParams = (objParams) => {
+        if (objParams) {
+            if (objParams.instruments) {
+                this.setState({ instruments: objParams.instruments });
+            }
+        }
+    }
+
     // TO DO
     //();
     //handle changes
@@ -173,7 +204,7 @@ class InsertInstrumentScreen extends InsertObjectScreen {
     handleChangeNumber = (text) => {
         let object = this.state.object;
         object.number = text;
-        object.id = text;
+        // object.id = text;
         this.setState({ object });
     };
 
@@ -183,9 +214,9 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         this.setState({ object });
     };
 
-    handleChangeIsPowered = (text) => {
+    handleChangePowered = (value) => {
         let object = this.state.object;
-        object.isPowered = text;
+        object.powered = value;
         this.setState({ object });
     };
 
@@ -203,13 +234,38 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         let condition = {
             id: null,
             input: null,
-            value: 0,
-            operationType: null
+            valueId: 0,
+            operationType: null,
+            value: object.conditions.length ? object.conditions.length + 1 : 1
         };
 
         object.powerConditions.push(condition);
         this.setState({ object });
     };
+
+    handleClickEditCondition = (condition) => {
+        let object = this.state.object;
+
+        let conditionSave = null;
+        let index = -1;
+
+        object.powerConditions.filter( c => {
+            return c.valueId === condition.valueId
+        }).map( (c, i) => {
+            conditionSave = c;
+            index = i;
+        });
+
+        if (conditionSave) {
+            conditionSave.input = condition.input;
+            conditionSave.value = condition.value;
+            conditionSave.value = condition.value;
+        } else {
+            object.conditions.push(condition);
+        }
+        
+        this.setState({ object });
+    }
     
     handleClickRemoveCondition = (index) => {
         let object = this.state.object;
@@ -332,7 +388,9 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                     title={"Condição " + (i + 1)}
                     editable={this.state.crudMode === crudMode.edit}
                     condition={condition}
-                    onPressRemove={() => this.handleClickRemoveCondition(i)} />
+                    onPressRemove={() => this.handleClickRemoveCondition(i)}
+                    handleClickEditCondition={this.handleClickEditCondition}
+                    inputs={this.state.instruments} />
             );
         });
     };
@@ -421,8 +479,8 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                         Ligado
                     </Text>
                     <Switch 
-                        value={this.state.object.isPowered}
-                        onValueChange={this.handleChangeIsPowered}
+                        value={this.state.object.powered}
+                        onValueChange={this.handleChangePowered}
                         disabled={this.state.crudMode !== crudMode.edit}
                         style={{ flex: 1, alignSelf: 'flex-end', marginRight: 20 }} />
                 </View>

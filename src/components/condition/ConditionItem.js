@@ -33,7 +33,8 @@ class ConditionItem extends Component {
             show: false,
             title: null,
             editable: false,
-            condition: null
+            condition: null,
+            inputs: []
         };
     }
 
@@ -42,7 +43,8 @@ class ConditionItem extends Component {
             show: this.props.show ? this.props.show : false,
             title: this.props.title,
             editable: this.props.editable ? this.props.editable : false,
-            condition: this.props.condition ? this.props.condition : null
+            condition: this.props.condition ? this.props.condition : null,
+            inputs: this.props.inputs ? this.props.inputs : []
         });
     }
 
@@ -60,13 +62,17 @@ class ConditionItem extends Component {
         if (nextProps.condition !== this.props.condition) {
             this.setState({ condition: nextProps.condition });
         }
-
+        if (nextProps.inputs !== this.props.inputs) {
+            this.setState({ inputs: nextProps.inputs });
+        }
     }
 
     handleChangeValue = (value) => {
         let condition = this.state.condition;
         condition.value = value;
         this.setState({ condition });
+
+        this.handleAnyChange();
     };
 
     handleChangeInput = (inputList) => {
@@ -79,6 +85,8 @@ class ConditionItem extends Component {
         }
 
         this.setState({ condition });
+
+        this.handleAnyChange();
     };
 
     handleChangeOperationType = (operationTypeList) => {
@@ -91,8 +99,15 @@ class ConditionItem extends Component {
         }
 
         this.setState({ condition });
+
+        this.handleAnyChange();
     }
 
+    handleAnyChange = () => {
+        if (this.props.handleClickEditCondition)
+            this.props.handleClickEditCondition(this.state.condition);
+    }
+    
     render() {
         if (!this.state.show) {
             return(
@@ -124,6 +139,7 @@ class ConditionItem extends Component {
                         modalTitle={"Selecione um instrumento"}
                         multipleSelection={false}
                         editable={this.state.editable}
+                        items={this.state.inputs}
                         selectedItems={
                             this.state.condition && this.state.condition.input ? 
                             [this.state.condition.input] : null 

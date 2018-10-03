@@ -7,11 +7,13 @@ import {
     FETCH_CONTROL_MODULES,
     FETCH_PLACES,
     FETCH_PLACE,
-    FETCH_PIN_TYPES
+    FETCH_PIN_TYPES,
+    FETCH_CONTROL_MODULE,
+    FETCH_INSTRUMENTS
 } from './types';
 
-const serverURI = "http://192.168.0.101:8087";
-// const serverURI = "http://192.168.43.238:8087"
+// const serverURI = "http://192.168.0.101:8087";
+const serverURI = "http://192.168.43.238:8087"
 // const serverURI = "http://172.16.252.236:8087";
 
 const methodType = {
@@ -59,7 +61,7 @@ export const request = {
         address: serverURI + "/serv/control-module",
         params: [],
         variables: [],
-        fetchType: FETCH_CONTROL_MODULES
+        fetchType: FETCH_CONTROL_MODULE
     },
     sendUser: {
         methodType: methodType.POST_OR_PUT,
@@ -116,12 +118,21 @@ export const request = {
         params: [],
         variables: ["id"],
         fetchType: FETCH_PLACE
+    },
+    fetchInstruments: {
+        methodType: methodType.GET,
+        address: serverURI + "/serv/pin",
+        params: [],
+        variables: [],
+        fetchType: FETCH_INSTRUMENTS
     }
 };
 
 var token = null;
 
 export const fetchDefault = (requestType, data) => async dispatch => {
+
+    console.log("esse", requestType, data);
 
     let address = requestType.address;
 
