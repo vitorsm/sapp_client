@@ -16,6 +16,7 @@ import {
 const serverURI = "http://192.168.43.238:8087"
 // const serverURI = "http://172.16.252.236:8087";
 
+
 const methodType = {
     GET: 1,
     DELETE: 2,

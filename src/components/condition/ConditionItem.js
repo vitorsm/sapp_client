@@ -60,7 +60,12 @@ class ConditionItem extends Component {
             this.setState({ editable: nextProps.editable });
         }
         if (nextProps.condition !== this.props.condition) {
-            this.setState({ condition: nextProps.condition });
+            let condition = nextProps.condition;
+            if (condition.value) {
+                condition.value = condition.value + "";
+            }
+
+            this.setState({ condition: condition });
         }
         if (nextProps.inputs !== this.props.inputs) {
             this.setState({ inputs: nextProps.inputs });
@@ -169,10 +174,10 @@ class ConditionItem extends Component {
                     <Text style={styles.inputLabel}>
                         Valor
                     </Text>
-                    <TextInput 
+                    <TextInput
+                        onChangeText={this.handleChangeValue}
                         keyboardType={"numeric"}
                         value={this.state.condition.value}
-                        onChangeText={null}
                         style={styles.inputNumber}
                         editable={this.state.editable} />
                 </View>

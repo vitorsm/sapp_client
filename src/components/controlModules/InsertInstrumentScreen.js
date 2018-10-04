@@ -73,6 +73,29 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                  });
             }
         }
+        if (nextProps.instruments !== this.props.instruments) {
+            if (nextProps.instruments.error !== undefined) {
+                this.setState({ showProgress: false });
+                alert("Erro http: " + nextProps.instruments.error);
+            } else {
+                this.setInstruments(nextProps.instruments);
+
+                this.setState({ 
+                    showProgress: false
+                 });
+            }
+        }
+    }
+
+    setInstruments = (instruments) => {
+        if (this.state.object.id && this.state.object.id > 0 && instruments) {
+            let id = this.state.object.id;
+            this.setState({
+                instruments: instruments.filter(instrument => instrument.id !== id)
+            });
+        } else {
+            this.setState({ instruments: [] });
+        }
     }
 
     setObject = (instrumentReceived) => {
@@ -160,7 +183,7 @@ class InsertInstrumentScreen extends InsertObjectScreen {
     prepareCondition = (instrument) => {
         if (instrument && instrument.powerConditions && instrument.powerConditions.map) {
             instrument.powerConditions.map((condition, index) => {
-                condition.value = index;
+                condition.valueId = index;
             });
         } 
     }
@@ -227,6 +250,10 @@ class InsertInstrumentScreen extends InsertObjectScreen {
     }
 
     handleClickAddCondition = () => {
+        if (this.state.crudMode !== crudMode.edit) {
+            return;
+        }
+
         let object = this.state.object;
 
         if (object.powerConditions === null) object.powerConditions = [];
@@ -234,9 +261,10 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         let condition = {
             id: null,
             input: null,
-            valueId: 0,
+            value: 0,
             operationType: null,
-            value: object.conditions.length ? object.conditions.length + 1 : 1
+            pinId: object.id,
+            valueId: object.conditions ? object.conditions.length + 1 : 1
         };
 
         object.powerConditions.push(condition);
@@ -259,8 +287,9 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         if (conditionSave) {
             conditionSave.input = condition.input;
             conditionSave.value = condition.value;
-            conditionSave.value = condition.value;
+            conditionSave.valueId = condition.valueId;
         } else {
+            condition.pinId = object.id;
             object.conditions.push(condition);
         }
         
@@ -370,6 +399,51 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                 </View>
             </View>
         );
+    };
+
+    renderConditionsAction = () => {
+
+        if (!this.state.object || this.state.object.id <= 0) {
+            return(
+                <View>
+                    <Text style={styles.inputLabel}>
+                        É necessário cadastrar o instrumento antes de cadastrar suas condições.    
+                    </Text>    
+                </View>
+            );
+        }
+
+        return(
+            <View>
+
+                <Text style={styles.inputLabel}>
+                    Tipo de agrupamento das condições
+                </Text>
+                <View style={styles.input}>
+                    <RadioForm
+                        radio_props={groupTypes}
+                        initial={this.getGroupTypeValueById()}
+                        onPress={(value) => {this.handleChangeGroupType(value)}}
+                        buttonSize={10}
+                        formHorizontal={true}
+                        animation={false} />    
+                </View>
+
+                <View style={{ marginTop: 20 }}>
+                    { this.renderConditions() }
+                </View>
+
+                <View style={{ alignItems: "center" }}>
+                    <View style={{ marginTop: 20, width: "50%" }}>
+                        <TextButton 
+                            text={"Add condição"}
+                            onPress={this.handleClickAddCondition} />
+                    </View>
+                </View>
+
+            </View>
+        );
+
     };
 
     renderConditions = () => {
@@ -507,31 +581,8 @@ class InsertInstrumentScreen extends InsertObjectScreen {
 
 
                 <SeparatorGroupCrud isLine={true} text={"Condição de energia"}/>
-                
-                <Text style={styles.inputLabel}>
-                    Tipo de agrupamento das condições
-                </Text>
-                <View style={styles.input}>
-                    <RadioForm
-                        radio_props={groupTypes}
-                        initial={this.getGroupTypeValueById()}
-                        onPress={(value) => {this.handleChangeGroupType(value)}}
-                        buttonSize={10}
-                        formHorizontal={true}
-                        animation={false} />    
-                </View>
 
-                <View style={{ marginTop: 20 }}>
-                    { this.renderConditions() }
-                </View>
-
-                <View style={{ alignItems: "center" }}>
-                    <View style={{ marginTop: 20, width: "50%" }}>
-                        <TextButton 
-                            text={"Add condição"}
-                            onPress={this.handleClickAddCondition} />
-                    </View>
-                </View>
+                { this.renderConditionsAction() }
                 
             </ScrollView>
 
@@ -552,8 +603,8 @@ const specifStyles = StyleSheet.create({
 });
 
 
-function mapStateToProps({ pinTypes }) {
-    return { pinTypes };
+function mapStateToProps({ pinTypes, instruments }) {
+    return { pinTypes, instruments };
 }
 
 export default connect(mapStateToProps, actions)(InsertInstrumentScreen);
