@@ -15,7 +15,7 @@ import { constNavigation } from '../../Constants';
 
 
 const img = require('../../../imgs/home.png');
-const appName = "SAPP Client";
+const appName = "Cliente MG";
 
 
 const imgNetwork = require('../../../imgs/module_network.png');

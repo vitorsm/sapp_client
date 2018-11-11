@@ -93,6 +93,8 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             this.setState({
                 instruments: instruments.filter(instrument => instrument.id !== id)
             });
+        } else if (instruments) {
+            this.setState({ instruments });
         } else {
             this.setState({ instruments: [] });
         }
@@ -107,7 +109,9 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             isNull = false;
 
             instrument.number = instrument.number + "";
-            
+            if (instrument.setPoint)
+                instrument.setPoint = instrument.setPoint + "";
+                
             this.prepareCondition(instrument);
 
             if (instrument.historySampleTime) {
@@ -284,6 +288,10 @@ class InsertInstrumentScreen extends InsertObjectScreen {
             index = i;
         });
 
+        if (condition.value) {
+            condition.value = parseInt(condition.value);
+        }
+
         if (conditionSave) {
             conditionSave.input = condition.input;
             conditionSave.value = condition.value;
@@ -334,6 +342,16 @@ class InsertInstrumentScreen extends InsertObjectScreen {
 
     handleChangeInput = (inputList) => {
         let object = this.state.object;
+
+        if (!object.pidControl) {
+            object.pidControl = {
+                kp: "0",
+                ki: "0",
+                kd: "0",
+                sampleTime: "0",
+                input: null
+            }
+        }
 
         if (inputList && inputList.length > 0) {
             object.pidControl.input = inputList[0];
@@ -456,6 +474,9 @@ class InsertInstrumentScreen extends InsertObjectScreen {
         }
 
         return conditions.map((condition, i) => {
+            if (condition.value)
+                condition.value = condition.value + "";
+
             return(
                 <ConditionItem
                     key={i}
@@ -490,9 +511,9 @@ class InsertInstrumentScreen extends InsertObjectScreen {
                         modalTitle={"Selecione um instrumento"}
                         multipleSelection={false}
                         editable={ this.state.crudMode == crudMode.edit }
-                        textAddButton={"ADD instrumento"}
+                        // textAddButton={"ADD instrumento"}
                         items={this.state.instruments}
-                        selectedItems={this.state.object.pidControl.input ? 
+                        selectedItems={this.state.object.pidControl && this.state.object.pidControl.input ? 
                             [this.state.object.pidControl.input] :
                             []
                         }

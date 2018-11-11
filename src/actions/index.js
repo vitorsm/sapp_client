@@ -12,8 +12,8 @@ import {
     FETCH_INSTRUMENTS
 } from './types';
 
-// const serverURI = "http://192.168.0.101:8087";
-const serverURI = "http://192.168.43.238:8087"
+const serverURI = "http://192.168.0.101:8087";
+// const serverURI = "http://192.168.43.238:8087"
 // const serverURI = "http://172.16.252.236:8087";
 
 
